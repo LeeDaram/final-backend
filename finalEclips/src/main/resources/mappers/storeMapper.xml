@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.finalEclips.eclips.store.repository.StoreMapper">
+    <select id="findAllStore" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
+        select store_id, 
+                user_id,
+                industry_id, 
+                contact, 
+                store_image,
+                average_rating,
+                takeout,
+                delivery,
+                wifi,
+                pet,
+                kid,
+                parking,
+                created_at,
+                updated_at
+         from GOOD_PRICE_BUSINESS
+    </select>
+        
+        <select id="findPaginatedStores" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
+        SELECT t.*
+        FROM (
+            <include refid="CommonSql.storePaginationSql" />
+        ) t
+        <include refid="CommonSql.paginationWhere" />
+    </select>
+
+        <select id="findPaginatedStoresCount" resultType="int">
+            SELECT count(*)
+            FROM (
+                <include refid="CommonSql.storePaginationSql" />
+            ) t
+        </select>
+</mapper>

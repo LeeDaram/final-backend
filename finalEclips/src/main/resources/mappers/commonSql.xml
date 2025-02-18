@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CommonSql">
+        <sql id="storePaginationSql">
+       SELECT ROW_NUMBER() OVER (ORDER BY store_id ASC) AS row_num,
+                 g.store_id,
+                 g.user_id,
+                 g.INDUSTRY_ID,
+                 g.CONTACT,
+                 g.STORE_IMAGE,
+                 g.AVERAGE_RATING,
+                 g.TAKEOUT,
+                 g.DELIVERY,
+                 g.WIFI,
+                 g.PET,
+                 g.KID,
+                 g.PARKING,
+                 b.STORE_NAME 
+        FROM GOOD_PRICE_BUSINESS g
+        INNER JOIN BUSINESS_USER b
+        ON g.USER_ID = b.USER_ID
+    </sql>
+
+    <sql id="paginationWhere">
+        <![CDATA[WHERE row_num >= #{pageable.offset} + 1 AND row_num <= #{pageable.offset} + #{pageable.pageSize}]]>
+    </sql>
+</mapper>
