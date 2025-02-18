@@ -18,6 +18,12 @@ public class StoreDto {
     private String pet;
     private String kid;
     private String parking;
+    private String storeName;
+    private String industryName;
+    private String mainMenu;
+    private int price;
+    private String sigunguName;
+    private String sidoName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
