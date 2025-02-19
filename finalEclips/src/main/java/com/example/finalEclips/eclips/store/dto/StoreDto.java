@@ -11,13 +11,14 @@ public class StoreDto {
     private int industryId;
     private String contact;
     private String storeImage;
-    private int averageRating;
+    private float averageRating;
     private String takeOut;
     private String delivery;
     private String wifi;
     private String pet;
     private String kid;
     private String parking;
+    private String average;
     private String storeName;
     private String industryName;
     private String mainMenu;

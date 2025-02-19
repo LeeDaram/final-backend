@@ -23,18 +23,37 @@
          from GOOD_PRICE_BUSINESS
     </select>
         
-        <select id="findPaginatedStores" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
+    <select id="findPaginatedStores" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
         SELECT t.*
         FROM (
             <include refid="CommonSql.storePaginationSql" />
         ) t
         <include refid="CommonSql.paginationWhere" />
     </select>
-
-        <select id="findPaginatedStoresCount" resultType="int">
+    
+    <select id="findPaginatedStoresCount" resultType="int">
             SELECT count(*)
             FROM (
                 <include refid="CommonSql.storePaginationSql" />
             ) t
-        </select>
+    </select>
+    
+    <select id="findSidoName" resultType="com.example.finalEclips.eclips.store.dto.SidoDto">
+    	SELECT SIDO_ID,
+			   SIDO_NAME 
+		FROM SIDO
+    </select>
+    
+    <select id="findSigunguName" resultType="com.example.finalEclips.eclips.store.dto.SigunguDto">
+    	SELECT SIGUNGU_ID,
+    		   SIDO_ID,
+			   SIGUNGU_NAME
+		FROM SIGUNGU
+    </select>
+    
+        <select id="findIndustryName" resultType="com.example.finalEclips.eclips.store.dto.IndustryDto">
+    	SELECT INDUSTRY_ID,
+			   INDUSTRY_NAME 
+		FROM INDUSTRY
+    </select>
 </mapper>
