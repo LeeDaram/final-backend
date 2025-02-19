@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.finalEclips.eclips.user.repository.UserMapper">
+
+    <!-- 아이디 중복확인 -->
+    <select id="findUserById" resultType="com.example.finalEclips.eclips.user.dto.UserDto">
+        SELECT COUNT(*)
+		FROM USER_TABLE
+		WHERE USER_ID = #{userId}
+    </select>
+
+    <!-- 회원가입 - 공통 -->
+    <insert id="saveUser">
+        INSERT INTO USER_TABLE
+        (USER_ID, PASSWORD, NAME, BIRTH_DATE, PHONE_NUMBER, EMAIL, "ROLE", LOGIN_TYPE, CREATED_AT, UPDATED_AT)
+        VALUES(#{userId}, #{password}, #{name}, #{birthDate}, #{phoneNumber}, #{email}, #{role}, #{loginType}, CURRENT_TIMESTAMP , CURRENT_TIMESTAMP )
+    </insert>
+
+    <!-- 시군구 찾기 -->
+    <select id="findSigunguId" resultType="int">
+	    SELECT s.SIGUNGU_ID 
+	    FROM SIGUNGU s
+	    JOIN SIDO si ON s.SIDO_ID = si.SIDO_ID
+	    WHERE si.SIDO_NAME = #{sidoName} 
+	    AND s.SIGUNGU_NAME = #{sigunguName}
+    </select>
+    
+    <!-- 회원가입 - 사업자 -->
+    <insert id="saveBizUser">
+        INSERT INTO BUSINESS_USER (USER_ID, BUSINESS_REG_NO, STORE_NAME, ADDRESS, SIGUNGU_ID)
+        VALUES (#{userId}, #{businessRegNo}, #{storeName}, #{address}, #{sigunguId})
+    </insert>
+    
+</mapper>
