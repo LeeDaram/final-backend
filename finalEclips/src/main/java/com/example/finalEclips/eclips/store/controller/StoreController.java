@@ -13,6 +13,7 @@ import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
 import com.example.finalEclips.eclips.store.dto.StoreDto;
+import com.example.finalEclips.eclips.store.dto.StoreFilterDto;
 import com.example.finalEclips.eclips.store.dto.StoreRequestDto;
 import com.example.finalEclips.eclips.store.service.StoreService;
 
@@ -43,4 +44,12 @@ public class StoreController {
  	public ResponseEntity<List<IndustryDto>> gtIndustry(){
  		return ResponseEntity.ok(storeService.getIndustry());
  	}
+ 	
+ 	@GetMapping("/filter")
+ 	public ResponseEntity<PageImpl<StoreFilterDto>> getFilterStore(StoreRequestDto storeRequestDto,
+ 			 @PageableDefault(size = 8, page = 0) Pageable pageable){
+ 		return ResponseEntity.ok(storeService.getStoreFilter(storeRequestDto, pageable));
+ 	}
+ 	
+
 }

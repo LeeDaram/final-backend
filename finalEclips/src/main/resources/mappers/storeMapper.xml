@@ -5,6 +5,7 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.finalEclips.eclips.store.repository.StoreMapper">
+
     <select id="findAllStore" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
         select store_id, 
                 user_id,
@@ -29,6 +30,7 @@
             <include refid="CommonSql.storePaginationSql" />
         ) t
         <include refid="CommonSql.paginationWhere" />
+        
     </select>
     
     <select id="findPaginatedStoresCount" resultType="int">
@@ -51,9 +53,52 @@
 		FROM SIGUNGU
     </select>
     
-        <select id="findIndustryName" resultType="com.example.finalEclips.eclips.store.dto.IndustryDto">
+    <select id="findIndustryName" resultType="com.example.finalEclips.eclips.store.dto.IndustryDto">
     	SELECT INDUSTRY_ID,
 			   INDUSTRY_NAME 
 		FROM INDUSTRY
     </select>
+    
+    <select id="filterStore" resultType="com.example.finalEclips.eclips.store.dto.StoreFilterDto">
+    	SELECT ROW_NUMBER() OVER (ORDER BY g.store_id ASC) AS row_num,
+                    g.store_id,
+                    g.user_id,
+                    g.INDUSTRY_ID,
+                    g.CONTACT,
+                    g.STORE_IMAGE,
+                    g.AVERAGE_RATING,
+                    g.TAKEOUT,
+                    g.DELIVERY,
+                    g.WIFI,
+                    g.PET,
+                    g.KID,
+                    g.PARKING,
+                    b.STORE_NAME,
+                    i.INDUSTRY_NAME,
+                    sg.SIGUNGU_NAME,
+                    sg.SIGUNGU_ID ,
+                    sd.SIDO_NAME 
+               FROM GOOD_PRICE_BUSINESS g
+               JOIN BUSINESS_USER b
+               ON g.USER_ID = b.USER_ID
+               JOIN INDUSTRY i 
+               ON g.INDUSTRY_ID = i.INDUSTRY_ID
+               JOIN SIGUNGU sg
+               ON b.SIGUNGU_ID = sg.SIGUNGU_ID 
+               JOIN SIDO sd
+               ON sg.SIDO_ID = sd.SIDO_ID
+               WHERE sd.SIDO_ID = #{sidoId}
+               AND sd.SIDO_NAME = #{sidoName}
+               AND sg.SIGUNGU_ID = #{sigunguId}
+               AND sg.SIGUNGU_NAME = #{sigunguName}
+               AND i.INDUSTRY_ID = #{industryId}
+               AND i.INDUSTRY_NAME = #{industryName}
+               AND g.TAKEOUT = #{takeout}
+               AND g.DELIVERY = #{delivery}
+               AND g.WIFI = #{wifi}
+               AND g.PET = #{pet}
+               AND g.KID = #{kid}
+               AND g.PARKING = #{parking}
+    </select>
+
 </mapper>

@@ -11,6 +11,7 @@ import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
 import com.example.finalEclips.eclips.store.dto.StoreDto;
+import com.example.finalEclips.eclips.store.dto.StoreFilterDto;
 import com.example.finalEclips.eclips.store.dto.StoreRequestDto;
 import com.example.finalEclips.eclips.store.repository.StoreMapper;
 
@@ -46,5 +47,17 @@ public class StoreServiceImpl implements StoreService {
 	public List<IndustryDto> getIndustry() {
 		return storeMapper.findIndustryName();
 	}
+
+	@Override
+	public PageImpl<StoreFilterDto> getStoreFilter(StoreRequestDto storeRequestDto, Pageable pageable) {
+        PaginationDto<?> paginationDto = PaginationDto.builder().data(storeRequestDto).pageable(pageable).build();
+        List<StoreFilterDto> content = storeMapper.filterStore(paginationDto);
+        int totalCount = storeMapper.filterStoreCount(paginationDto);
+		
+        return new PageImpl<>(content, pageable, totalCount);
+	}
+
+
+	
     
 }

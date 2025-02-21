@@ -9,6 +9,7 @@ import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
 import com.example.finalEclips.eclips.store.dto.StoreDto;
+import com.example.finalEclips.eclips.store.dto.StoreFilterDto;
 import com.example.finalEclips.eclips.store.dto.StoreRequestDto;
 
 public interface StoreService {
@@ -16,4 +17,5 @@ public interface StoreService {
     List<SidoDto> getSido(); // 시도 데이터
     List<SigunguDto> getSigungu(); // 시군구 데이터
     List<IndustryDto> getIndustry(); // 업종명 데이터
+    PageImpl<StoreFilterDto> getStoreFilter(StoreRequestDto storeRequestDto, Pageable pageable); // 필터 업소
 }
