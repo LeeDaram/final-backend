@@ -11,3 +11,16 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
     jdbc-type-for-null: NULL
+
+jwt:
+  secret: 6364b0d2de554d3e942b1b8b048345251ce116d2a7264276973bb342f0e55def
+  iss: nextit.or.kr
+  sub: myapp-jwt
+  expiration-milliseconds: 86400000 # 만료기한 1일
+cookie:
+  jwt:
+    name: jwt_cookie
+    http-only: false
+    secure: false
+    path: /
+    maxAge: 604800

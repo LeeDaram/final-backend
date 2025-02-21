@@ -7,7 +7,7 @@
 
     <!-- 아이디 중복확인 -->
     <select id="findUserById" resultType="com.example.finalEclips.eclips.user.dto.UserDto">
-        SELECT COUNT(*)
+        SELECT USER_ID, PASSWORD, NAME, BIRTH_DATE, PHONE_NUMBER, EMAIL, "ROLE", LOGIN_TYPE, CREATED_AT, UPDATED_AT 
 		FROM USER_TABLE
 		WHERE USER_ID = #{userId}
     </select>

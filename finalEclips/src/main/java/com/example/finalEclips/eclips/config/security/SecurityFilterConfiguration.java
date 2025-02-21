@@ -8,12 +8,25 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.example.finalEclips.eclips.config.exception.JwtAccessDeniedHandler;
+import com.example.finalEclips.eclips.config.exception.JwtAuthenticationEntryPoint;
+import com.example.finalEclips.eclips.config.jwt.JwtFilter;
+import com.example.finalEclips.eclips.config.jwt.TokenProvider;
+
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class SecurityFilterConfiguration {
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final TokenProvider tokenProvider;
+
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -22,7 +35,7 @@ public class SecurityFilterConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(req -> {
-            req.requestMatchers("/api/users/sign-up/*").permitAll().requestMatchers("/api/users/sign-in/*").permitAll()
+            req.requestMatchers("/api/users/sign-up/*").permitAll().requestMatchers("/api/users/sign-in").permitAll()
                     .requestMatchers("/api/users/sign-out").permitAll().requestMatchers("/api/users/personal/**")
                     .hasRole("USER").requestMatchers("/api/users/biz/**").hasRole("BIZ")
                     .requestMatchers("/api/users/admin/**").hasRole("ADMIN").anyRequest().authenticated();
@@ -33,6 +46,10 @@ public class SecurityFilterConfiguration {
         http.formLogin(AbstractHttpConfigurer::disable);
         http.httpBasic(AbstractHttpConfigurer::disable);
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+        http.exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler));
+        http.addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
