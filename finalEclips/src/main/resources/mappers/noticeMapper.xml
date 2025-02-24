@@ -10,7 +10,7 @@
 		type="com.example.finalEclips.eclips.notice.dto.NoticeDto">
 		<id property="noticeId" column="notice_id" />
 		<result property="title" column="title" />
-		<result property="content" column="content" jdbcType="CLOB"/>
+		<result property="content" column="content"/>
 		<result property="isMainNotice" column="is_main_notice" />
 		<result property="createdAt" column="notice_create" />
 		<result property="updatedAt" column="notice_update" />
@@ -58,4 +58,42 @@
 		FROM NOTICE_ATTACHMENTS
 		WHERE ATTACHMENT_ID = #{attachmentId}
 	</select>
+	
+	<select id="findSearchNotice" resultType="com.example.finalEclips.eclips.notice.dto.NoticeDto" resultMap="noticeResultMap">
+	SELECT
+	      NOTICE_ID, 
+	      TITLE, 
+	      TO_CHAR(DBMS_LOB.SUBSTR(CONTENT, LENGTH(CONTENT), 1)) AS CONTENT,
+	      IS_MAIN_NOTICE, 
+	      CREATED_AT AS notice_create,
+	      UPDATED_AT AS notice_update
+	FROM notice
+	WHERE TITLE LIKE '%' ||  #{search} || '%'
+	OR TO_CHAR(DBMS_LOB.SUBSTR(CONTENT, LENGTH(CONTENT), 1)) LIKE '%' ||  #{search} || '%'
+	ORDER BY IS_MAIN_NOTICE DESC, CREATED_AT DESC
+	</select>
+	
+	<select id="findNoticeById" resultType="com.example.finalEclips.eclips.notice.dto.NoticeUpdateDto" resultMap="noticeResultMap">
+	SELECT
+	      NOTICE_ID, 
+	      TITLE, 
+	      TO_CHAR(DBMS_LOB.SUBSTR(CONTENT, LENGTH(CONTENT), 1)) AS CONTENT,
+	      IS_MAIN_NOTICE, 
+	      CREATED_AT AS notice_create,
+	      UPDATED_AT AS notice_update
+	FROM notice
+	WHERE NOTICE_ID = #{id}
+	</select>
+	
+	<update id="updateNoticeById">
+	UPDATE NOTICE SET 
+				 TITLE = #{title}, 
+			     CONTENT = #{content, jdbcType=CLOB}, 
+			     UPDATED_AT = CURRENT_TIMESTAMP 
+    WHERE NOTICE_ID = #{id}
+	</update>
+	
+	<delete id="deleteNoticeById">
+	DELETE NOTICE WHERE notice_id = #{id}
+	</delete>
 </mapper>
