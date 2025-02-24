@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.finalEclips.eclips.common.dto.PaginationDto;
+import com.example.finalEclips.eclips.store.dto.FilterRequestDto;
 import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
@@ -49,15 +50,12 @@ public class StoreServiceImpl implements StoreService {
 	}
 
 	@Override
-	public PageImpl<StoreFilterDto> getStoreFilter(StoreRequestDto storeRequestDto, Pageable pageable) {
-        PaginationDto<?> paginationDto = PaginationDto.builder().data(storeRequestDto).pageable(pageable).build();
+	public PageImpl<StoreFilterDto> getStoreFilter(FilterRequestDto filterRequestDto, Pageable pageable) {
+        PaginationDto<?> paginationDto = PaginationDto.builder().data(filterRequestDto).pageable(pageable).build();
         List<StoreFilterDto> content = storeMapper.filterStore(paginationDto);
         int totalCount = storeMapper.filterStoreCount(paginationDto);
 		
         return new PageImpl<>(content, pageable, totalCount);
 	}
-
-
-	
     
 }

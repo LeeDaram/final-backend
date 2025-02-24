@@ -3,16 +3,14 @@ package com.example.finalEclips.eclips.store.dto;
 import lombok.Data;
 
 @Data
-public class StoreFilterDto {
+public class FilterRequestDto {
 	private int sidoId;
 	private String sidoName;
-	private int sigunguId;
 	private String sigunguName;
-	private int industryId;
 	private String industryName;
-	private String storeImage;
-	private String storeName;
-	private String mainMenu;
+	private int sigunguId;
+	private int industryId;
+	private int userId;
 	private float averageRating;
 	private int price;
 	private String contact;
@@ -22,4 +20,6 @@ public class StoreFilterDto {
 	private String pet;
 	private String kid;
 	private String parking;
+	private String mainMenu;
+	private String storeName;
 }

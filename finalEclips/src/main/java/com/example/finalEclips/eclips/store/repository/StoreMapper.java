@@ -18,6 +18,6 @@ public interface StoreMapper {
     List<SidoDto> findSidoName(); // 시도
     List<SigunguDto> findSigunguName(); // 시군구
     List<IndustryDto> findIndustryName(); // 업종명
-    List<StoreFilterDto> filterStore(PaginationDto<?> paginationDto); // 필터 페이지 쪼개버리기
+    List<StoreFilterDto> filterStore(PaginationDto<?> paginationDto); // 필터 페이지 쪼개기
     int filterStoreCount(PaginationDto<?> paginationDto); // 필터 총 페이지 카운트
 }

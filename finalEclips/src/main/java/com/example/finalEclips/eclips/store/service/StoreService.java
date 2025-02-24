@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import com.example.finalEclips.eclips.store.dto.FilterRequestDto;
 import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
@@ -17,5 +18,5 @@ public interface StoreService {
     List<SidoDto> getSido(); // 시도 데이터
     List<SigunguDto> getSigungu(); // 시군구 데이터
     List<IndustryDto> getIndustry(); // 업종명 데이터
-    PageImpl<StoreFilterDto> getStoreFilter(StoreRequestDto storeRequestDto, Pageable pageable); // 필터 업소
+    PageImpl<StoreFilterDto> getStoreFilter(FilterRequestDto filterRequestDto, Pageable pageable); // 필터 업소
 }

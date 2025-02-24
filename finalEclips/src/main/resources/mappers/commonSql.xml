@@ -40,4 +40,102 @@
     <sql id="paginationWhere">
         <![CDATA[WHERE row_num >= #{pageable.offset} + 1 AND row_num <= #{pageable.offset} + #{pageable.pageSize}]]>
     </sql>
+    
+    <sql id="filterPaginationSql">
+    	    	SELECT ROW_NUMBER() OVER (ORDER BY g.store_id ASC) AS row_num,
+                    g.store_id as g_store_id,
+                    g.user_id,
+                    g.INDUSTRY_ID,
+                    g.CONTACT,
+                    g.STORE_IMAGE,
+                    g.AVERAGE_RATING,
+                    g.TAKEOUT,
+                    g.DELIVERY,
+                    g.WIFI,
+                    g.PET,
+                    g.KID,
+                    g.PARKING,
+                    a.store_id as a_store_id,
+                    a.price,
+                    b.STORE_NAME,
+                    i.INDUSTRY_NAME,
+                    sg.SIGUNGU_NAME,
+                    sg.SIGUNGU_ID,
+                    sd.SIDO_ID,
+                    sd.SIDO_NAME, 
+                        (SELECT am.main_menu 
+				       FROM approval_management am  
+				      WHERE am.store_id = g.store_id
+				        AND ROWNUM = 1
+				     ) AS main_menu
+               FROM GOOD_PRICE_BUSINESS g
+               JOIN BUSINESS_USER b
+               ON g.USER_ID = b.USER_ID
+               JOIN INDUSTRY i 
+               ON g.INDUSTRY_ID = i.INDUSTRY_ID
+               JOIN SIGUNGU sg
+               ON b.SIGUNGU_ID = sg.SIGUNGU_ID 
+               JOIN SIDO sd
+               ON sg.SIDO_ID = sd.SIDO_ID
+               JOIN APPROVAL_MANAGEMENT a
+               ON g.store_id = a.store_id
+               
+               WHERE 1=1
+               
+               <if test="data.sidoId != null and data.sidoId != ''">
+               AND sd.SIDO_ID = #{data.sidoId}
+               </if>
+               
+               <if test="data.sidoName != null and data.sidoName != ''">
+               AND sd.SIDO_NAME = #{data.sidoName}
+               </if>
+               
+               <if test="data.sigunguId != null and data.sigunguId != ''">
+               AND sg.SIGUNGU_ID = #{data.sigunguId}
+               </if>
+               
+               <if test="data.sigunguName != null and data.sigunguName != ''">
+               AND sg.SIGUNGU_NAME = #{data.sigunguName}
+               </if>
+               
+               <if test="data.industryId != null and data.industryId != ''">
+               AND i.INDUSTRY_ID = #{data.industryId}
+               </if>
+               
+               <if test="data.industryName != null and data.industryName != ''">
+               AND i.INDUSTRY_NAME = #{data.industryName}
+               </if>
+               
+               <if test="data.storeName != null and data.storeName != ''">
+			    AND b.STORE_NAME LIKE CONCAT('%', #{data.storeName}, '%')
+			    </if>
+			    
+			    <if test="data.mainMenu != null and data.mainMenu != ''">
+			        AND g.MAIN_MENU LIKE CONCAT('%', #{data.mainMenu}, '%')
+			    </if>
+               
+               <if test="data.takeout != null and data.takeout != ''">
+               AND g.TAKEOUT = #{data.takeout}
+               </if>
+               
+               <if test="data.delivery != null and data.delivery != ''">
+               AND g.DELIVERY = #{data.delivery}
+               </if>
+               
+               <if test="data.wifi != null and data.wifi != ''">
+               AND g.WIFI = #{data.wifi}
+               </if>
+               
+               <if test="data.pet != null and data.pet != ''">
+               AND g.PET = #{data.pet}
+               </if>
+               
+               <if test="data.kid != null and data.kid != ''">
+               AND g.KID = #{data.kid}
+               </if>
+               
+               <if test="data.parking != null and data.parking != ''">
+               AND g.PARKING = #{data.parking}
+               </if>
+    </sql>
 </mapper>

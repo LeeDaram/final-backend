@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.finalEclips.eclips.store.dto.FilterRequestDto;
 import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
@@ -24,11 +25,11 @@ import lombok.RequiredArgsConstructor;
 public class StoreController {
  private final StoreService storeService;
  
- 	@GetMapping("/stores")
- 	public ResponseEntity<PageImpl<StoreDto>> getStores(StoreRequestDto storeRequestDto, 
-		 @PageableDefault(size = 8, page = 0) Pageable pageable){
-     	return ResponseEntity.ok(storeService.getStores(storeRequestDto, pageable));
- 	}
+// 	@GetMapping("/stores")
+// 	public ResponseEntity<PageImpl<StoreDto>> getStores(StoreRequestDto storeRequestDto, 
+//		 @PageableDefault(size = 8, page = 0) Pageable pageable){
+//     	return ResponseEntity.ok(storeService.getStores(storeRequestDto, pageable));
+// 	}
  
  	@GetMapping("/sido")
  	public ResponseEntity<List<SidoDto>> getSido(){
@@ -45,10 +46,10 @@ public class StoreController {
  		return ResponseEntity.ok(storeService.getIndustry());
  	}
  	
- 	@GetMapping("/filter")
- 	public ResponseEntity<PageImpl<StoreFilterDto>> getFilterStore(StoreRequestDto storeRequestDto,
+ 	@GetMapping("/stores")
+ 	public ResponseEntity<PageImpl<StoreFilterDto>> getFilterStore(FilterRequestDto filterRequestDto,
  			 @PageableDefault(size = 8, page = 0) Pageable pageable){
- 		return ResponseEntity.ok(storeService.getStoreFilter(storeRequestDto, pageable));
+ 		return ResponseEntity.ok(storeService.getStoreFilter(filterRequestDto, pageable));
  	}
  	
 

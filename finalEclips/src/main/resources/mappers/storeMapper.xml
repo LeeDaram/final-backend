@@ -29,8 +29,7 @@
         FROM (
             <include refid="CommonSql.storePaginationSql" />
         ) t
-        <include refid="CommonSql.paginationWhere" />
-        
+        <include refid="CommonSql.paginationWhere" />       
     </select>
     
     <select id="findPaginatedStoresCount" resultType="int">
@@ -60,45 +59,18 @@
     </select>
     
     <select id="filterStore" resultType="com.example.finalEclips.eclips.store.dto.StoreFilterDto">
-    	SELECT ROW_NUMBER() OVER (ORDER BY g.store_id ASC) AS row_num,
-                    g.store_id,
-                    g.user_id,
-                    g.INDUSTRY_ID,
-                    g.CONTACT,
-                    g.STORE_IMAGE,
-                    g.AVERAGE_RATING,
-                    g.TAKEOUT,
-                    g.DELIVERY,
-                    g.WIFI,
-                    g.PET,
-                    g.KID,
-                    g.PARKING,
-                    b.STORE_NAME,
-                    i.INDUSTRY_NAME,
-                    sg.SIGUNGU_NAME,
-                    sg.SIGUNGU_ID ,
-                    sd.SIDO_NAME 
-               FROM GOOD_PRICE_BUSINESS g
-               JOIN BUSINESS_USER b
-               ON g.USER_ID = b.USER_ID
-               JOIN INDUSTRY i 
-               ON g.INDUSTRY_ID = i.INDUSTRY_ID
-               JOIN SIGUNGU sg
-               ON b.SIGUNGU_ID = sg.SIGUNGU_ID 
-               JOIN SIDO sd
-               ON sg.SIDO_ID = sd.SIDO_ID
-               WHERE sd.SIDO_ID = #{sidoId}
-               AND sd.SIDO_NAME = #{sidoName}
-               AND sg.SIGUNGU_ID = #{sigunguId}
-               AND sg.SIGUNGU_NAME = #{sigunguName}
-               AND i.INDUSTRY_ID = #{industryId}
-               AND i.INDUSTRY_NAME = #{industryName}
-               AND g.TAKEOUT = #{takeout}
-               AND g.DELIVERY = #{delivery}
-               AND g.WIFI = #{wifi}
-               AND g.PET = #{pet}
-               AND g.KID = #{kid}
-               AND g.PARKING = #{parking}
+		select t.*
+		from(
+			<include refid="CommonSql.filterPaginationSql" />
+		)t
+		<include refid="CommonSql.paginationWhere" />
+    </select>
+    
+    <select id="filterStoreCount" resultType="int">
+    	    SELECT count(*)
+            FROM (
+                <include refid="CommonSql.filterPaginationSql" />
+            ) t
     </select>
 
 </mapper>
