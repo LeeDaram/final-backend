@@ -17,6 +17,7 @@ import com.example.finalEclips.eclips.config.exception.JwtAccessDeniedHandler;
 import com.example.finalEclips.eclips.config.exception.JwtAuthenticationEntryPoint;
 import com.example.finalEclips.eclips.config.jwt.JwtFilter;
 import com.example.finalEclips.eclips.config.jwt.TokenProvider;
+import com.example.finalEclips.eclips.user.service.UserServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,12 +34,13 @@ public class SecurityFilterConfiguration {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, UserServiceImpl userService) throws Exception {
         http.authorizeHttpRequests(req -> {
             req.requestMatchers("/api/users/sign-up/*").permitAll().requestMatchers("/api/users/sign-in").permitAll()
-                    .requestMatchers("/api/users/sign-out").permitAll().requestMatchers("/api/users/personal/**")
-                    .hasRole("USER").requestMatchers("/api/users/biz/**").hasRole("BIZ")
-                    .requestMatchers("/api/users/admin/**").hasRole("ADMIN").anyRequest().authenticated();
+                    .requestMatchers("/", "/login/**", "/oauth2/**").permitAll().requestMatchers("/api/users/sign-out")
+                    .permitAll().requestMatchers("/api/users/personal/**").hasRole("USER")
+                    .requestMatchers("/api/users/biz/**").hasRole("BIZ").requestMatchers("/api/users/admin/**")
+                    .hasRole("ADMIN").anyRequest().authenticated();
         });
 
         http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -47,9 +49,16 @@ public class SecurityFilterConfiguration {
         http.httpBasic(AbstractHttpConfigurer::disable);
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
+        // 로컬 로그인 예외 처리
         http.exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler));
+
+        // JWT 필터 추가
         http.addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+
+        // OAuth2 로그인 활성화
+        http.oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000").failureUrl("/login?error=true")
+                .userInfoEndpoint(userInfo -> userInfo.userService(userService)));
 
         return http.build();
     }

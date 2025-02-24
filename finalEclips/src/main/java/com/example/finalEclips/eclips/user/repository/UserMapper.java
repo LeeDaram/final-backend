@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
+import com.example.finalEclips.eclips.user.dto.CreateOAuthUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
 
@@ -13,6 +14,12 @@ public interface UserMapper {
     // 아이디 중복확인
     UserDto findUserById(String id);
 
+    // 이메일 확인
+    UserDto findUserByEmail(String email);
+
+    // 회원가입 - 구글
+    void saveOAuthUser(CreateOAuthUserDto createOAuthUserDto);
+
     // 회원가입 - 공통
     void saveUser(CreateUserDto createUserDto);
 
@@ -21,4 +28,5 @@ public interface UserMapper {
 
     // 회원가입 - 사업자
     void saveBizUser(CreateBizUserDto createBizUserDto);
+
 }

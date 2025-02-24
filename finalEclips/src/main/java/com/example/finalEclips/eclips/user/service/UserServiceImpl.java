@@ -1,12 +1,20 @@
 package com.example.finalEclips.eclips.user.service;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +25,7 @@ import com.example.finalEclips.eclips.config.jwt.TokenProvider;
 import com.example.finalEclips.eclips.config.property.ErrorMessagePropertySource;
 import com.example.finalEclips.eclips.helper.SecurityHelper;
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
+import com.example.finalEclips.eclips.user.dto.CreateOAuthUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
 import com.example.finalEclips.eclips.user.dto.SignInDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
@@ -26,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -34,10 +43,16 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
 
-    // 유저찾기
+    // 유저찾기 : 아이디
     @Override
     public UserDto getUser(String id) {
         return userMapper.findUserById(id);
+    }
+
+    // 유저찾기 : 이메일
+    @Override
+    public UserDto getUserEmail(String email) {
+        return userMapper.findUserByEmail(email);
     }
 
     // 개인회원 회원가입
@@ -147,6 +162,54 @@ public class UserServiceImpl implements UserService {
     public Optional<UserDto> getLoggedUser() {
         Optional<String> loggedId = SecurityHelper.getLoggedId();
         return loggedId.map(userMapper::findUserById);
+    }
+
+    // OAuth 회원가입 (구글 로그인)
+    @Transactional
+    @Override
+    public void saveOAuthUser(CreateOAuthUserDto createOAuthUserDto) {
+
+        // 이메일 중복확인
+        UserDto userEmail = getUserEmail(createOAuthUserDto.getEmail());
+        if (userEmail != null) {
+            throw new AlreadyExistedUserException(errorMessagePropertySource.getAlreadyExistedUser());
+        }
+
+        // 권한설정
+        createOAuthUserDto.setRole(UserRole.ROLE_USER);
+
+        // 로그인 타입 설정
+        createOAuthUserDto.setLoginType(LoginType.SOCIAL);
+
+        // 저장
+        userMapper.saveOAuthUser(createOAuthUserDto);
+
+    }
+
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(userRequest);
+
+        String email = oAuth2User.getAttribute("email");
+        if (email == null) {
+            throw new OAuth2AuthenticationException("OAuth2 로그인 시 이메일 정보가 없습니다.");
+        }
+
+        UserDto existingUser = userMapper.findUserByEmail(email);
+
+        if (existingUser == null) {
+            CreateOAuthUserDto newUser = new CreateOAuthUserDto();
+            newUser.setEmail(email);
+            newUser.setName(oAuth2User.getAttribute("name"));
+            newUser.setRole(UserRole.ROLE_USER);
+            newUser.setLoginType(LoginType.SOCIAL);
+            userMapper.saveOAuthUser(newUser);
+
+            existingUser = userMapper.findUserByEmail(email);
+        }
+
+        return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(existingUser.getRole().name())),
+                oAuth2User.getAttributes(), "email");
     }
 
 }

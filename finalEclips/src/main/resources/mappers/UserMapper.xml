@@ -11,6 +11,20 @@
 		FROM USER_TABLE
 		WHERE USER_ID = #{userId}
     </select>
+    
+    <!-- 이메일 중복확인 -->
+    <select id="findUserByEmail" resultType="com.example.finalEclips.eclips.user.dto.UserDto">
+        SELECT USER_ID, PASSWORD, NAME, BIRTH_DATE, PHONE_NUMBER, EMAIL, "ROLE", LOGIN_TYPE, CREATED_AT, UPDATED_AT 
+        FROM USER_TABLE
+        WHERE EMAIL = #{email}
+    </select>
+
+    <!-- 회원가입 - 구글 -->
+	<insert id="saveOAuthUser">
+	    INSERT INTO USER_TABLE
+	    (USER_ID, NAME, EMAIL, "ROLE", LOGIN_TYPE, CREATED_AT, UPDATED_AT)
+	    VALUES(#{email}, #{name}, #{email}, #{role}, #{loginType}, CURRENT_TIMESTAMP , CURRENT_TIMESTAMP)
+	</insert>
 
     <!-- 회원가입 - 공통 -->
     <insert id="saveUser">

@@ -6,6 +6,17 @@ spring:
     url: jdbc:oracle:thin:@nextit.or.kr:21521:xe
     username: team202408_01
     password: oracle21c
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 94365936844-3dnf5tj6l0k9et5e1897725648fcc9a9.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - profile
+              - email
 
 mybatis:
   mapper-locations: classpath:mappers/**/*.xml
