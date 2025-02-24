@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
 
-    // 아이디 중복확인
+    // 유저찾기
     @Override
     public UserDto getUser(String id) {
         return userMapper.findUserById(id);
@@ -134,7 +134,9 @@ public class UserServiceImpl implements UserService {
 
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-            return tokenProvider.createToken(authentication);
+            UserDto user = getUser(signInDto.getUserId());
+
+            return tokenProvider.createToken(authentication, user.getName());
         } catch (Exception ex) {
             throw new BadCredentialsException(errorMessagePropertySource.getBadCredentials());
         }

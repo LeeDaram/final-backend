@@ -45,7 +45,7 @@ public class TokenProvider implements InitializingBean {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    public String createToken(Authentication authentication) {
+    public String createToken(Authentication authentication, String name) {
         // 권한
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -54,7 +54,7 @@ public class TokenProvider implements InitializingBean {
         Date expiration = new Date(now.getTime() + (jwtPropertySource.getExpirationSeconds())); // 만료일 계산
 
         return Jwts.builder().issuedAt(now).issuer(jwtPropertySource.getIss()).subject(authentication.getName())
-                .expiration(expiration).claim(AUTH_CLAIM_KEY, authorities).signWith(key).compact();
+                .expiration(expiration).claim(AUTH_CLAIM_KEY, authorities).claim("name", name).signWith(key).compact();
     }
 
     public Authentication getAuthentication(String token) {
