@@ -3,7 +3,9 @@ package com.example.finalEclips.eclips.notice.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.finalEclips.eclips.notice.dto.CreateNoticeDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeUpdateDto;
@@ -33,6 +35,7 @@ public class NoticeServiceImpl implements NoticeService {
 
 	@Override
 	public NoticeDto getNoticeById(int id) {
+		noticeMapper.incrementViewCount(id);
 		return noticeMapper.findNoticeById(id);
 	}
 
@@ -46,6 +49,12 @@ public class NoticeServiceImpl implements NoticeService {
 	@Override
 	public void deleteNoticeById(int id) {
 		noticeMapper.deleteNoticeById(id);
+	}
+
+	@Override
+	public void createNotice(CreateNoticeDto createNoticeDto) {
+		noticeMapper.saveNotice(createNoticeDto);
+		
 	}	
 
 }

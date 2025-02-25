@@ -14,6 +14,7 @@
 		<result property="isMainNotice" column="is_main_notice" />
 		<result property="createdAt" column="notice_create" />
 		<result property="updatedAt" column="notice_update" />
+		<result property="views" column="views" />
 		<collection property="attachments"
 			ofType="com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto">
 			<result property="attachmentId" column="attachment_id" />
@@ -34,6 +35,7 @@
 		      n.IS_MAIN_NOTICE,
 		      n.CREATED_AT AS notice_create,
 		      n.UPDATED_AT AS notice_update,
+		      n.VIEWS AS views,
 		      na.ATTACHMENT_ID,
 		      na.NOTICE_ID AS attachment_notice_id,
 		      na.ORIGIN_FILENAME,
@@ -66,7 +68,8 @@
 	      TO_CHAR(DBMS_LOB.SUBSTR(CONTENT, LENGTH(CONTENT), 1)) AS CONTENT,
 	      IS_MAIN_NOTICE, 
 	      CREATED_AT AS notice_create,
-	      UPDATED_AT AS notice_update
+	      UPDATED_AT AS notice_update,
+	      VIEWS AS views
 	FROM notice
 	WHERE TITLE LIKE '%' ||  #{search} || '%'
 	OR TO_CHAR(DBMS_LOB.SUBSTR(CONTENT, LENGTH(CONTENT), 1)) LIKE '%' ||  #{search} || '%'
@@ -80,7 +83,8 @@
 	      TO_CHAR(DBMS_LOB.SUBSTR(CONTENT, LENGTH(CONTENT), 1)) AS CONTENT,
 	      IS_MAIN_NOTICE, 
 	      CREATED_AT AS notice_create,
-	      UPDATED_AT AS notice_update
+	      UPDATED_AT AS notice_update,
+	      VIEWS AS views
 	FROM notice
 	WHERE NOTICE_ID = #{id}
 	</select>
@@ -96,4 +100,16 @@
 	<delete id="deleteNoticeById">
 	DELETE NOTICE WHERE notice_id = #{id}
 	</delete>
+	
+	<insert id="saveNotice">
+	INSERT INTO NOTICE (TITLE, CONTENT, IS_MAIN_NOTICE)
+	VALUES( #{title}, #{content}, #{isMainNotice})
+	</insert>
+	
+	
+	<update id="incrementViewCount">
+        UPDATE NOTICE
+        SET VIEWS = VIEWS + 1
+        WHERE NOTICE_ID = #{id}
+    </update>
 </mapper>

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.example.finalEclips.eclips.notice.dto.CreateNoticeDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeUpdateDto;
@@ -12,8 +13,11 @@ import com.example.finalEclips.eclips.notice.dto.NoticeUpdateDto;
 public interface NoticeMapper {
 	List<NoticeDto> findAllNotices();
 	NoticeAttachmentDto findNoticeAttachmentById(int id);
+	
 	List<NoticeDto> findSearchNotice(String search);
 	NoticeDto findNoticeById(int id);
 	void updateNoticeById(NoticeUpdateDto noticeUpdateDto);
 	void deleteNoticeById(int id);
+	void saveNotice(CreateNoticeDto createNoticeDto);
+	void incrementViewCount(int id);
 }
