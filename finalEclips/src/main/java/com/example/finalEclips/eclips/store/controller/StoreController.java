@@ -7,12 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finalEclips.eclips.store.dto.FilterRequestDto;
 import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
+import com.example.finalEclips.eclips.store.dto.StoreAddressDto;
 import com.example.finalEclips.eclips.store.dto.StoreDto;
 import com.example.finalEclips.eclips.store.dto.StoreFilterDto;
 import com.example.finalEclips.eclips.store.dto.StoreRequestDto;
@@ -49,7 +51,14 @@ public class StoreController {
  	@GetMapping("/stores")
  	public ResponseEntity<PageImpl<StoreFilterDto>> getFilterStore(FilterRequestDto filterRequestDto,
  			 @PageableDefault(size = 8, page = 0) Pageable pageable){
+ 		System.out.println("/stores");
+ 		System.out.println(filterRequestDto);
  		return ResponseEntity.ok(storeService.getStoreFilter(filterRequestDto, pageable));
+ 	}
+ 	
+ 	@GetMapping("/address")
+ 	public ResponseEntity<List<StoreAddressDto>> getAllAddress(){
+ 		return ResponseEntity.ok(storeService.getAllAddress());
  	}
  	
 

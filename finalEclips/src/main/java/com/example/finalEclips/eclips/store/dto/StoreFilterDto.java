@@ -14,6 +14,7 @@ public class StoreFilterDto {
 	private String storeName;
 	private String mainMenu;
 	private float averageRating;
+	private int likeCount;
 	private int price;
 	private String contact;
 	private String takeout;
@@ -22,4 +23,5 @@ public class StoreFilterDto {
 	private String pet;
 	private String kid;
 	private String parking;
+	private String address;
 }

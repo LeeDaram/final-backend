@@ -62,8 +62,12 @@
 		select t.*
 		from(
 			<include refid="CommonSql.filterPaginationSql" />
-		)t
+		) t
+		
+		
 		<include refid="CommonSql.paginationWhere" />
+		
+		
     </select>
     
     <select id="filterStoreCount" resultType="int">
@@ -71,6 +75,11 @@
             FROM (
                 <include refid="CommonSql.filterPaginationSql" />
             ) t
+    </select>
+    
+    <select id="findAllAddress" resultType="com.example.finalEclips.eclips.store.dto.StoreAddressDto">
+    	select *
+    	from BUSINESS_USER
     </select>
 
 </mapper>

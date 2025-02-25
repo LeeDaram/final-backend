@@ -8,6 +8,7 @@ import com.example.finalEclips.eclips.common.dto.PaginationDto;
 import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
+import com.example.finalEclips.eclips.store.dto.StoreAddressDto;
 import com.example.finalEclips.eclips.store.dto.StoreDto;
 import com.example.finalEclips.eclips.store.dto.StoreFilterDto;
 
@@ -20,4 +21,5 @@ public interface StoreMapper {
     List<IndustryDto> findIndustryName(); // 업종명
     List<StoreFilterDto> filterStore(PaginationDto<?> paginationDto); // 필터 페이지 쪼개기
     int filterStoreCount(PaginationDto<?> paginationDto); // 필터 총 페이지 카운트
+    List<StoreAddressDto> findAllAddress(); // 주소
 }
