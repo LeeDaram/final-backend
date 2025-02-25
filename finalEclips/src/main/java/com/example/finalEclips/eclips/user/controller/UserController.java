@@ -1,10 +1,15 @@
 package com.example.finalEclips.eclips.user.controller;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finalEclips.eclips.config.jwt.TokenDto;
+import com.example.finalEclips.eclips.config.jwt.TokenProvider;
 import com.example.finalEclips.eclips.helper.CookieHelper;
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
@@ -19,6 +25,8 @@ import com.example.finalEclips.eclips.user.dto.SignInDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
 import com.example.finalEclips.eclips.user.service.UserService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +37,7 @@ public class UserController {
 
     private final UserService userService;
     private final CookieHelper cookieHelper;
+    private final TokenProvider tokenProvider;
 
     // 회원가입 : 개인회원
     @PostMapping("/sign-up/personal")
@@ -75,6 +84,46 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<Optional<UserDto>> getLoggedUser() {
         return ResponseEntity.ok(userService.getLoggedUser());
+    }
+
+    // 구글 사용자 정보 조회 (JWT 포함)
+    @GetMapping("/oauth2/me")
+    public ResponseEntity<?> getOAuth2User(HttpServletRequest request) {
+        String token = getTokenFromCookie(request);
+
+        if (token == null) {
+            return ResponseEntity.status(401).body(Collections.singletonMap("error", "Token not found"));
+        }
+
+        try {
+            if (!tokenProvider.isValidToken(token)) {
+                return ResponseEntity.status(401).body(Collections.singletonMap("error", "Invalid token"));
+            }
+
+            Authentication authentication = tokenProvider.getAuthentication(token);
+            String email = authentication.getName();
+
+            UserDto userDto = userService.getUserEmail(email);
+            if (userDto == null) {
+                return ResponseEntity.status(404).body(Collections.singletonMap("error", "User not found"));
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("user", userDto);
+            response.put("token", token);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Internal Server Error"));
+        }
+    }
+
+    private String getTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            return Arrays.stream(request.getCookies()).filter(cookie -> "Authorization".equals(cookie.getName()))
+                    .map(Cookie::getValue).findFirst().orElse(null);
+        }
+        return null;
     }
 
 }

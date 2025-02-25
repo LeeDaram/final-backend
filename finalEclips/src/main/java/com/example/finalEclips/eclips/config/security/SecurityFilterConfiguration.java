@@ -15,10 +15,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.finalEclips.eclips.config.exception.JwtAccessDeniedHandler;
 import com.example.finalEclips.eclips.config.exception.JwtAuthenticationEntryPoint;
+import com.example.finalEclips.eclips.config.jwt.CustomOAuth2SuccessHandler;
 import com.example.finalEclips.eclips.config.jwt.JwtFilter;
 import com.example.finalEclips.eclips.config.jwt.TokenProvider;
 import com.example.finalEclips.eclips.user.service.UserServiceImpl;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -27,6 +29,7 @@ public class SecurityFilterConfiguration {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final TokenProvider tokenProvider;
+    private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -35,13 +38,11 @@ public class SecurityFilterConfiguration {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, UserServiceImpl userService) throws Exception {
-        http.authorizeHttpRequests(req -> {
-            req.requestMatchers("/api/users/sign-up/*").permitAll().requestMatchers("/api/users/sign-in").permitAll()
-                    .requestMatchers("/", "/login/**", "/oauth2/**").permitAll().requestMatchers("/api/users/sign-out")
-                    .permitAll().requestMatchers("/api/users/personal/**").hasRole("USER")
-                    .requestMatchers("/api/users/biz/**").hasRole("BIZ").requestMatchers("/api/users/admin/**")
-                    .hasRole("ADMIN").anyRequest().authenticated();
-        });
+        http.authorizeHttpRequests(req -> req.requestMatchers("/api/users/sign-up/**").permitAll()
+                .requestMatchers("/api/users/sign-in").permitAll().requestMatchers("/", "/login/**", "/oauth2/**")
+                .permitAll().requestMatchers("/api/users/sign-out").permitAll()
+                .requestMatchers("/api/users/personal/**").hasRole("USER").requestMatchers("/api/users/biz/**")
+                .hasRole("BIZ").requestMatchers("/api/users/admin/**").hasRole("ADMIN").anyRequest().authenticated());
 
         http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.csrf(AbstractHttpConfigurer::disable);
@@ -56,9 +57,17 @@ public class SecurityFilterConfiguration {
         // JWT 필터 추가
         http.addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
 
-        // OAuth2 로그인 활성화
-        http.oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000").failureUrl("/login?error=true")
-                .userInfoEndpoint(userInfo -> userInfo.userService(userService)));
+        // OAuth2 로그인
+        http.oauth2Login(oauth2 -> oauth2.failureUrl("/login?error=true")
+                .userInfoEndpoint(userInfo -> userInfo.userService(userService))
+                .successHandler(customOAuth2SuccessHandler));
+
+        // 로그아웃 처리
+        http.logout(logout -> logout.logoutUrl("/api/users/sign-out").invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", "Authorization")
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                }));
 
         return http.build();
     }
