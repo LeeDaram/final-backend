@@ -45,7 +45,7 @@
 		      na.CREATED_AT AS attachment_create
 		FROM NOTICE n 
 		LEFT OUTER JOIN NOTICE_ATTACHMENTS na ON n.notice_id = na.notice_id
-		 ORDER BY n.IS_MAIN_NOTICE DESC, n.CREATED_AT DESC
+		ORDER BY n.IS_MAIN_NOTICE DESC, n.CREATED_AT DESC
 	</select>
 	
 	<select id="findNoticeAttachmentById" resultType="com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto">

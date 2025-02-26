@@ -5,14 +5,77 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.finalEclips.eclips.qna.repository.QnaMapper">
 
-	<select id="findAllQnas" resultType="com.example.finalEclips.eclips.qna.dto.QnaDto">
+<resultMap id="qnaAnswerMap" type="com.example.finalEclips.eclips.qna.dto.QnaDto">
+    <id property="questionId" column="question_id" />
+    <result property="userId" column="user_id" />
+    <result property="title" column="title" />
+    <result property="content" column="qna_content" />
+    <result property="createdAt" column="qna_created_at" />
+    <result property="views" column="views" />
+    <collection property="answers" ofType="com.example.finalEclips.eclips.qna.dto.AnswerDto">
+        <result property="questionId" column="question_id" />
+        <result property="content" column="answer_content" />
+        <result property="createdAt" column="answer_created_at" />
+        <result property="updateAt" column="update_at" />
+    </collection>
+</resultMap>
+
+	<select id="findAllQnas" resultMap="qnaAnswerMap">
 	SELECT 
-	 	  QUESTION_ID, 
-	 	  USER_ID, 
-	 	  TITLE, 
-	 	  CONTENT,
-	 	  CREATED_AT
-	FROM QUESTION
-	ORDER BY CREATED_AT DESC
+          q.QUESTION_ID, 
+          q.USER_ID, 
+          q.TITLE, 
+          q.CONTENT AS QNA_CONTENT, 
+          q.CREATED_AT AS QNA_CREATED_AT, 
+          q.VIEWS,
+          a.QUESTION_ID AS question_answer, 
+          a.CONTENT AS ANSWER_CONTENT, 
+          a.CREATED_AT AS ANSWER_CREATED_AT, 
+          a.UPDATED_AT 
+	FROM QUESTION q
+	LEFT OUTER JOIN ANSWER a 
+    ON q.QUESTION_ID = a.QUESTION_ID
+    ORDER BY q.QUESTION_ID DESC, q.CREATED_AT DESC
+    
 	</select> 
+	
+	<select id="findQnaById" resultMap="qnaAnswerMap">
+	SELECT 
+          q.QUESTION_ID, 
+          q.USER_ID, 
+          q.TITLE, 
+          q.CONTENT AS QNA_CONTENT, 
+          q.CREATED_AT AS QNA_CREATED_AT, 
+          q.VIEWS,
+          a.QUESTION_ID AS question_answer, 
+          a.CONTENT AS ANSWER_CONTENT, 
+          a.CREATED_AT AS ANSWER_CREATED_AT, 
+          a.UPDATED_AT 
+	FROM QUESTION q
+	LEFT OUTER JOIN ANSWER a 
+    ON q.QUESTION_ID = a.QUESTION_ID
+    WHERE q.QUESTION_ID = #{id}
+	</select>
+	
+	<update id="incrementViewCount">
+        UPDATE QUESTION
+        SET VIEWS = VIEWS + 1
+        WHERE QUESTION_ID = #{id}
+    </update>
+    
+    <insert id="saveQna">
+    	INSERT INTO QUESTION
+		(USER_ID, TITLE, CONTENT)
+		VALUES( #{userId}, #{title}, #{content})
+    </insert>
+    
+    <delete id="deleteQnaById">
+		DELETE QUESTION WHERE QUESTION_ID = #{id}
+	</delete>
+	
+	<insert id="saveQnaAnswer">
+		INSERT INTO ANSWER
+		(CONTENT, QUESTION_ID)
+		VALUES( #{content}, #{questionId})
+	</insert>
 </mapper>
