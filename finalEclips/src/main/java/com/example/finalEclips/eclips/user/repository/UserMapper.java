@@ -17,12 +17,6 @@ public interface UserMapper {
     // 아이디 중복확인
     UserDto findUserById(String id);
 
-    // 이메일 확인
-    UserDto findUserByEmail(String email);
-
-    // 이메일 아이디
-    UserDto findUserByEmailAndUserId(@Param("email") String email, @Param("userId") String userId);
-
     // 회원가입 - 구글
     void saveOAuthUser(CreateOAuthUserDto createOAuthUserDto);
 

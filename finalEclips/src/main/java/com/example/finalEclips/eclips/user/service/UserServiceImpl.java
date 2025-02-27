@@ -51,12 +51,6 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
         return userMapper.findUserById(id);
     }
 
-    // 유저찾기 : 이메일
-    @Override
-    public UserDto getUserEmail(String email) {
-        return userMapper.findUserByEmail(email);
-    }
-
     // 개인회원 회원가입
     @Override
     public void createUser(CreateUserDto createUserDto) {
@@ -125,6 +119,11 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
         UserDto userId = getUser(createBizUserDto.getUserId());
         if (userId != null) {
             throw new AlreadyExistedUserException(errorMessagePropertySource.getAlreadyExistedUser());
+        }
+
+        // 이메일 인증 확인
+        if (!emailService.isEmailVerified(createBizUserDto.getEmail())) {
+            throw new IllegalStateException("이메일 인증이 완료되지 않았습니다.");
         }
 
         // 비밀번호 암호화
@@ -236,12 +235,6 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
     @Override
     public void saveTermsAgreement(String userId, String isAgree) {
         userMapper.saveTermsAgreement(userId, isAgree);
-    }
-
-    // 아이디 비밀번호
-    @Override
-    public UserDto getUserByEmailAndUserId(String email, String userId) {
-        return userMapper.findUserByEmailAndUserId(email, userId);
     }
 
 }

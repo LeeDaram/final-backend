@@ -15,12 +15,6 @@ public interface UserService {
     // 아이디 중복확인
     UserDto getUser(String id);
 
-    // 이메일 중복확인
-    UserDto getUserEmail(String email);
-
-    // 이메일 아이디 확인
-    UserDto getUserByEmailAndUserId(String email, String userId);
-
     // 회원가입 - 구글
     void saveOAuthUser(CreateOAuthUserDto createOAuthUserDto);
 

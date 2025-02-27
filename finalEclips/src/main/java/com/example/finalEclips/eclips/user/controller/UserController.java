@@ -112,7 +112,7 @@ public class UserController {
             Authentication authentication = tokenProvider.getAuthentication(token);
             String email = authentication.getName();
 
-            UserDto userDto = userService.getUserEmail(email);
+            UserDto userDto = userService.getUser(email);
             if (userDto == null) {
                 return ResponseEntity.status(404).body(Collections.singletonMap("error", "User not found"));
             }
