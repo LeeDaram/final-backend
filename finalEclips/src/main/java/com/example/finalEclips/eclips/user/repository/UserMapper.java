@@ -1,11 +1,14 @@
 package com.example.finalEclips.eclips.user.repository;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateOAuthUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
+import com.example.finalEclips.eclips.user.dto.TermsDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
 
 @Mapper
@@ -16,6 +19,9 @@ public interface UserMapper {
 
     // 이메일 확인
     UserDto findUserByEmail(String email);
+
+    // 이메일 아이디
+    UserDto findUserByEmailAndUserId(@Param("email") String email, @Param("userId") String userId);
 
     // 회원가입 - 구글
     void saveOAuthUser(CreateOAuthUserDto createOAuthUserDto);
@@ -28,5 +34,11 @@ public interface UserMapper {
 
     // 회원가입 - 사업자
     void saveBizUser(CreateBizUserDto createBizUserDto);
+
+    // 약관 불러오기
+    List<TermsDto> findAllTerms();
+
+    // 동의여부 저장하기
+    void saveTermsAgreement(@Param("userId") String userId, @Param("isAgree") String isAgree);
 
 }

@@ -29,7 +29,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         String email = authentication.getName();
 
-        UserDto user = userMapper.findUserByEmail(email);
+        UserDto user = userMapper.findUserById(email);
 
         if (user == null) {
             throw new UsernameNotFoundException("User not found");

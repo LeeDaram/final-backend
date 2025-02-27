@@ -38,11 +38,17 @@ public class SecurityFilterConfiguration {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, UserServiceImpl userService) throws Exception {
-        http.authorizeHttpRequests(req -> req.requestMatchers("/api/users/sign-up/**").permitAll()
-                .requestMatchers("/api/users/sign-in").permitAll().requestMatchers("/", "/login/**", "/oauth2/**")
-                .permitAll().requestMatchers("/api/users/sign-out").permitAll()
+        http.authorizeHttpRequests(auth -> auth
+                // 회원가입, 로그인, 로그아웃, 이메일 인증
+                .requestMatchers("/api/users/sign-up/**", "/api/users/sign-in", "/api/users/sign-out").permitAll()
+                .requestMatchers("/", "/login/**", "/oauth2/**", "/api/users/**", "/api/email/**").permitAll()
+
+                // 역할
                 .requestMatchers("/api/users/personal/**").hasRole("USER").requestMatchers("/api/users/biz/**")
-                .hasRole("BIZ").requestMatchers("/api/users/admin/**").hasRole("ADMIN").anyRequest().authenticated());
+                .hasRole("BIZ").requestMatchers("/api/users/admin/**").hasRole("ADMIN")
+
+                // 그 외 모든 요청
+                .anyRequest().authenticated());
 
         http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.csrf(AbstractHttpConfigurer::disable);

@@ -13,6 +13,13 @@
     </select>
     
     <!-- 이메일 중복확인 -->
+    <select id="findUserByEmailAndUserId" resultType="com.example.finalEclips.eclips.user.dto.UserDto">
+        SELECT USER_ID, PASSWORD, NAME, BIRTH_DATE, PHONE_NUMBER, EMAIL, "ROLE", LOGIN_TYPE, CREATED_AT, UPDATED_AT 
+        FROM USER_TABLE
+        WHERE EMAIL = #{email} AND USER_ID = #{userId}
+    </select>
+    
+    <!-- 아이디 비밀번호 -->
     <select id="findUserByEmail" resultType="com.example.finalEclips.eclips.user.dto.UserDto">
         SELECT USER_ID, PASSWORD, NAME, BIRTH_DATE, PHONE_NUMBER, EMAIL, "ROLE", LOGIN_TYPE, CREATED_AT, UPDATED_AT 
         FROM USER_TABLE
@@ -28,9 +35,15 @@
 
     <!-- 회원가입 - 공통 -->
     <insert id="saveUser">
-        INSERT INTO USER_TABLE
-        (USER_ID, PASSWORD, NAME, BIRTH_DATE, PHONE_NUMBER, EMAIL, "ROLE", LOGIN_TYPE, CREATED_AT, UPDATED_AT)
-        VALUES(#{userId}, #{password}, #{name}, #{birthDate}, #{phoneNumber}, #{email}, #{role}, #{loginType}, CURRENT_TIMESTAMP , CURRENT_TIMESTAMP )
+	    INSERT INTO USER_TABLE
+		    (USER_ID, PASSWORD, NAME, EMAIL, "ROLE", LOGIN_TYPE, CREATED_AT, UPDATED_AT
+		    <if test="birthDate != null">, BIRTH_DATE</if>
+		    <if test="phoneNumber != null">, PHONE_NUMBER</if>
+	    )
+	    VALUES (#{userId}, #{password}, #{name}, #{email}, #{role}, #{loginType}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+		    <if test="birthDate != null">, #{birthDate}</if>
+		    <if test="phoneNumber != null">, #{phoneNumber}</if>
+        )
     </insert>
 
     <!-- 시군구 찾기 -->
@@ -46,6 +59,18 @@
     <insert id="saveBizUser">
         INSERT INTO BUSINESS_USER (USER_ID, BUSINESS_REG_NO, STORE_NAME, ADDRESS, SIGUNGU_ID)
         VALUES (#{userId}, #{businessRegNo}, #{storeName}, #{address}, #{sigunguId})
+    </insert>
+    
+    <!-- 약관 불러오기 -->
+    <select id="findAllTerms" resultType="com.example.finalEclips.eclips.user.dto.TermsDto">
+        SELECT TERMS_ID, TITLE, CONTENT, IS_REQUIRED, CREATED_AT, UPDATED_AT
+        FROM TERMS
+    </select>
+    
+    <!-- 약관 동의여부 저장 -->
+    <insert id="saveTermsAgreement">
+	    INSERT INTO TERMS_AGREEMENT (USER_ID, TERMS_ID, IS_AGREE, CREATED_AT)
+	    VALUES (#{userId}, 4, #{isAgree}, CURRENT_TIMESTAMP)
     </insert>
     
 </mapper>

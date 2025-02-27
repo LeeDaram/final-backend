@@ -1,6 +1,7 @@
 package com.example.finalEclips.eclips.user.service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.authentication.BadCredentialsException;
@@ -16,7 +17,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.finalEclips.eclips.common.dto.LoginType;
 import com.example.finalEclips.eclips.common.dto.UserRole;
@@ -28,6 +28,7 @@ import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateOAuthUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
 import com.example.finalEclips.eclips.user.dto.SignInDto;
+import com.example.finalEclips.eclips.user.dto.TermsDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
 import com.example.finalEclips.eclips.user.repository.UserMapper;
 
@@ -42,6 +43,7 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
     private final ErrorMessagePropertySource errorMessagePropertySource;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
+    private final EmailService emailService;
 
     // 유저찾기 : 아이디
     @Override
@@ -56,18 +58,23 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
     }
 
     // 개인회원 회원가입
-    @Transactional
     @Override
     public void createUser(CreateUserDto createUserDto) {
 
-        // 아이디 중복확인
-        UserDto userId = getUser(createUserDto.getUserId());
-        if (userId != null) {
+        // 아이디 중복 확인
+        UserDto existingUser = getUser(createUserDto.getUserId());
+        if (existingUser != null) {
             throw new AlreadyExistedUserException(errorMessagePropertySource.getAlreadyExistedUser());
         }
 
+        // 이메일 인증 확인
+        if (!emailService.isEmailVerified(createUserDto.getEmail())) {
+            throw new IllegalStateException("이메일 인증이 완료되지 않았습니다.");
+        }
+
         // 비밀번호 암호화
-        createUserDto.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
+        String encodedPassword = passwordEncoder.encode(createUserDto.getPassword());
+        createUserDto.setPassword(encodedPassword);
 
         // 권한 설정: 개인회원
         createUserDto.setRole(UserRole.ROLE_USER);
@@ -78,6 +85,12 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
         // 개인회원 정보 저장
         userMapper.saveUser(createUserDto);
 
+        // 약관 동의 여부 저장
+        String agreementStatus = createUserDto.getIsAgree() ? "T" : "F";
+        saveTermsAgreement(createUserDto.getUserId(), agreementStatus);
+
+        // 이메일 인증정보 삭제
+        emailService.clearVerification(createUserDto.getEmail());
     }
 
     // 관리자 회원가입
@@ -105,7 +118,6 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
     }
 
     // 사업자 회원가입
-    @Transactional
     @Override
     public void createBizUser(CreateBizUserDto createBizUserDto) {
 
@@ -138,6 +150,9 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
         userMapper.saveUser(createBizUserDto);
         userMapper.saveBizUser(createBizUserDto);
 
+        // 약관 동의여부 저장
+        saveTermsAgreement(createBizUserDto.getUserId(), createBizUserDto.getIsAgree() ? "T" : "F");
+
     }
 
     // jwt 로그인, 로그아웃
@@ -165,12 +180,11 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
     }
 
     // OAuth 회원가입 (구글 로그인)
-    @Transactional
     @Override
     public void saveOAuthUser(CreateOAuthUserDto createOAuthUserDto) {
 
         // 이메일 중복확인
-        UserDto userEmail = getUserEmail(createOAuthUserDto.getEmail());
+        UserDto userEmail = getUser(createOAuthUserDto.getEmail());
         if (userEmail != null) {
             throw new AlreadyExistedUserException(errorMessagePropertySource.getAlreadyExistedUser());
         }
@@ -195,7 +209,7 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
             throw new OAuth2AuthenticationException("OAuth2 로그인 시 이메일 정보가 없습니다.");
         }
 
-        UserDto existingUser = userMapper.findUserByEmail(email);
+        UserDto existingUser = userMapper.findUserById(email);
 
         if (existingUser == null) {
             CreateOAuthUserDto newUser = new CreateOAuthUserDto();
@@ -205,11 +219,29 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
             newUser.setLoginType(LoginType.SOCIAL);
             userMapper.saveOAuthUser(newUser);
 
-            existingUser = userMapper.findUserByEmail(email);
+            existingUser = userMapper.findUserById(email);
         }
 
         return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(existingUser.getRole().name())),
                 oAuth2User.getAttributes(), "email");
+    }
+
+    // 약관 불러오기
+    @Override
+    public List<TermsDto> getAllTerms() {
+        return userMapper.findAllTerms();
+    }
+
+    // 약관 동의
+    @Override
+    public void saveTermsAgreement(String userId, String isAgree) {
+        userMapper.saveTermsAgreement(userId, isAgree);
+    }
+
+    // 아이디 비밀번호
+    @Override
+    public UserDto getUserByEmailAndUserId(String email, String userId) {
+        return userMapper.findUserByEmailAndUserId(email, userId);
     }
 
 }

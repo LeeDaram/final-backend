@@ -42,4 +42,6 @@ public class CreateUserDto {
 
     private LoginType loginType;
 
+    private Boolean isAgree;
+
 }

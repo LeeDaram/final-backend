@@ -3,6 +3,7 @@ package com.example.finalEclips.eclips.user.controller;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,7 @@ import com.example.finalEclips.eclips.helper.CookieHelper;
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
 import com.example.finalEclips.eclips.user.dto.SignInDto;
+import com.example.finalEclips.eclips.user.dto.TermsDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
 import com.example.finalEclips.eclips.user.service.UserService;
 
@@ -38,6 +41,12 @@ public class UserController {
     private final UserService userService;
     private final CookieHelper cookieHelper;
     private final TokenProvider tokenProvider;
+
+    // 아이디 중복확인
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDto> getUser(@PathVariable("id") String id) {
+        return ResponseEntity.ok(userService.getUser(id));
+    }
 
     // 회원가입 : 개인회원
     @PostMapping("/sign-up/personal")
@@ -124,6 +133,12 @@ public class UserController {
                     .map(Cookie::getValue).findFirst().orElse(null);
         }
         return null;
+    }
+
+    // 약관 불러오기
+    @GetMapping("/terms")
+    private ResponseEntity<List<TermsDto>> getAllTerms() {
+        return ResponseEntity.ok(userService.getAllTerms());
     }
 
 }
