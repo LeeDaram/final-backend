@@ -43,7 +43,6 @@ public class NoticeServiceImpl implements NoticeService {
 	public void updateNoticeById(int id, NoticeUpdateDto noticeUpdateDto) {
 		noticeUpdateDto.setId(id);
 		noticeMapper.updateNoticeById(noticeUpdateDto);
-		
 	}
 
 	@Override

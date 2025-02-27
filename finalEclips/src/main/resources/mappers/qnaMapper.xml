@@ -13,6 +13,7 @@
     <result property="createdAt" column="qna_created_at" />
     <result property="views" column="views" />
     <collection property="answers" ofType="com.example.finalEclips.eclips.qna.dto.AnswerDto">
+    	<result property="answerId" column="answer_id" />
         <result property="questionId" column="question_id" />
         <result property="content" column="answer_content" />
         <result property="createdAt" column="answer_created_at" />
@@ -28,6 +29,7 @@
           q.CONTENT AS QNA_CONTENT, 
           q.CREATED_AT AS QNA_CREATED_AT, 
           q.VIEWS,
+          a.ANSWER_ID AS answer_id,
           a.QUESTION_ID AS question_answer, 
           a.CONTENT AS ANSWER_CONTENT, 
           a.CREATED_AT AS ANSWER_CREATED_AT, 
@@ -47,6 +49,7 @@
           q.CONTENT AS QNA_CONTENT, 
           q.CREATED_AT AS QNA_CREATED_AT, 
           q.VIEWS,
+          a.ANSWER_ID AS answer_id,
           a.QUESTION_ID AS question_answer, 
           a.CONTENT AS ANSWER_CONTENT, 
           a.CREATED_AT AS ANSWER_CREATED_AT, 
@@ -78,4 +81,20 @@
 		(CONTENT, QUESTION_ID)
 		VALUES( #{content}, #{questionId})
 	</insert>
+	
+	<update id="updateQnaAnwerById">
+		UPDATE ANSWER
+		SET CONTENT= #{content}, UPDATED_AT = CURRENT_TIMESTAMP
+		WHERE ANSWER_ID = #{answerId}
+	</update>
+	
+	<delete id="deleteQnaAnswerById">
+		DELETE FROM ANSWER
+		WHERE ANSWER_ID = #{id}
+	</delete>
+	
+	<delete id="deleteAnswersByQuestionId" parameterType="int">
+    	DELETE FROM ANSWER WHERE QUESTION_ID = #{questionId}
+	</delete>
+	
 </mapper>

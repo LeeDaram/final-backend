@@ -3,7 +3,9 @@ package com.example.finalEclips.eclips.qna.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.finalEclips.eclips.qna.dto.AnswerUpdateDto;
 import com.example.finalEclips.eclips.qna.dto.CreateQnaAnswerDto;
 import com.example.finalEclips.eclips.qna.dto.CreateQnaDto;
 import com.example.finalEclips.eclips.qna.dto.QnaDto;
@@ -33,14 +35,29 @@ public class QnaServiceImpl implements QnaService{
 		qnaMapper.saveQna(createQnaDto);
 	}
 
+	@Transactional
 	@Override
 	public void deleteQnaById(int id) {
+//		qnaMapper.deleteQnaAnswerById(id); 모든답글삭제
+		qnaMapper.deleteAnswersByQuestionId(id); //모든답글 삭제
 		qnaMapper.deleteQnaById(id);
 	}
 
 	@Override
 	public void createQnaAnswer(CreateQnaAnswerDto createQnaAnswerDto) {
 		qnaMapper.saveQnaAnswer(createQnaAnswerDto);
+	}
+
+	@Override
+	public void updateQnaAnswerById(int id, AnswerUpdateDto answerUpdateDto) {
+		answerUpdateDto.setAnswerId(id);
+		qnaMapper.updateQnaAnwerById(answerUpdateDto);
+	}
+
+	@Override
+	public void deleteQnaAnswerById(int id) {
+		qnaMapper.deleteQnaAnswerById(id);
+		
 	}
 
 }
