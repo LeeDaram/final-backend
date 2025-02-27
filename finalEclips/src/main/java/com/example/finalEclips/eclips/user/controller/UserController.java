@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,8 +25,10 @@ import com.example.finalEclips.eclips.helper.CookieHelper;
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
 import com.example.finalEclips.eclips.user.dto.SignInDto;
+import com.example.finalEclips.eclips.user.dto.TermsAagreementDto;
 import com.example.finalEclips.eclips.user.dto.TermsDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
+import com.example.finalEclips.eclips.user.dto.UserInfoUpdate;
 import com.example.finalEclips.eclips.user.service.UserService;
 
 import jakarta.servlet.http.Cookie;
@@ -139,6 +142,28 @@ public class UserController {
     @GetMapping("/terms")
     private ResponseEntity<List<TermsDto>> getAllTerms() {
         return ResponseEntity.ok(userService.getAllTerms());
+    }
+
+    // 약관 동의 정보 불러오기
+    @GetMapping("/terms/{id}")
+    public ResponseEntity<TermsAagreementDto> getUserIdTermsAgreement(@PathVariable("id") String id) {
+        return ResponseEntity.ok(userService.getUserIdTermsAgreement(id));
+    }
+
+    @PutMapping("/update/personal/{userId}")
+    public String updateUserInfo(@PathVariable("userId") String userId, @RequestBody UserInfoUpdate request) {
+
+        UserDto userDto = request.getUserDto();
+        TermsAagreementDto termsAgreementDto = request.getTermsAgreementDto();
+
+        userDto.setUserId(userId);
+        termsAgreementDto.setUserId(userId);
+
+        userService.updateUserInfo(userDto);
+        userService.updateTermsAgreement(termsAgreementDto);
+        System.out.println("받은 데이터: " + request);
+
+        return "정보가 성공적으로 업데이트되었습니다.";
     }
 
 }

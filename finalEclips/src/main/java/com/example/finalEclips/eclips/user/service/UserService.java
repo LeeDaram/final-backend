@@ -7,6 +7,7 @@ import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateOAuthUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
 import com.example.finalEclips.eclips.user.dto.SignInDto;
+import com.example.finalEclips.eclips.user.dto.TermsAagreementDto;
 import com.example.finalEclips.eclips.user.dto.TermsDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
 
@@ -38,5 +39,14 @@ public interface UserService {
 
     // 약관동의
     void saveTermsAgreement(String userId, String isAgree);
+
+    // 약관동의여부 조회
+    TermsAagreementDto getUserIdTermsAgreement(String id);
+
+    // 사용자 정보 업데이트
+    void updateUserInfo(UserDto userDto);
+
+    // 약관 동의 업데이트
+    void updateTermsAgreement(TermsAagreementDto termsAagreementDto);
 
 }

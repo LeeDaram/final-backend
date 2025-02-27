@@ -28,6 +28,7 @@ import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateOAuthUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
 import com.example.finalEclips.eclips.user.dto.SignInDto;
+import com.example.finalEclips.eclips.user.dto.TermsAagreementDto;
 import com.example.finalEclips.eclips.user.dto.TermsDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
 import com.example.finalEclips.eclips.user.repository.UserMapper;
@@ -235,6 +236,22 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
     @Override
     public void saveTermsAgreement(String userId, String isAgree) {
         userMapper.saveTermsAgreement(userId, isAgree);
+    }
+
+    // 약관동의 여부 불러오기
+    @Override
+    public TermsAagreementDto getUserIdTermsAgreement(String id) {
+        return userMapper.findUserIdTermsAgreement(id);
+    }
+
+    // 사용자 정보 업데이트
+    public void updateUserInfo(UserDto userDto) {
+        userMapper.updateUserInfo(userDto);
+    }
+
+    // 약관 동의 정보 업데이트
+    public void updateTermsAgreement(TermsAagreementDto termsAagreementDto) {
+        userMapper.updateTermsAgreement(termsAagreementDto);
     }
 
 }

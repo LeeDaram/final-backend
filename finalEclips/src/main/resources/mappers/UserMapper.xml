@@ -59,4 +59,29 @@
 	    VALUES (#{userId}, 4, #{isAgree}, CURRENT_TIMESTAMP)
     </insert>
     
+    <!-- 약관 동의여부 불러오기 -->
+    <select id="findUserIdTermsAgreement" resultType="com.example.finalEclips.eclips.user.dto.TermsAagreementDto">
+	    SELECT USER_ID, TERMS_ID, IS_AGREE
+		FROM TERMS_AGREEMENT
+		WHERE USER_ID = #{userId}
+    </select>
+    
+    <!-- 사용자 정보 업데이트 -->
+	<update id="updateUserInfo" parameterType="com.example.finalEclips.eclips.user.dto.UserDto">
+	    UPDATE USER_TABLE
+	    SET
+	        PHONE_NUMBER = COALESCE(NULLIF(#{phoneNumber, jdbcType=VARCHAR}, ''), PHONE_NUMBER),
+	        EMAIL = COALESCE(NULLIF(#{email, jdbcType=VARCHAR}, ''), EMAIL),
+	        UPDATED_AT = CURRENT_TIMESTAMP
+	    WHERE USER_ID = #{userId}
+	</update>
+
+	<!-- 약관 동의 정보 업데이트 -->
+	<update id="updateTermsAgreement" parameterType="com.example.finalEclips.eclips.user.dto.TermsAagreementDto">
+	    UPDATE TERMS_AGREEMENT
+	    SET 
+	        IS_AGREE = COALESCE(NULLIF(#{isAgree, jdbcType=VARCHAR}, ''), IS_AGREE)
+	    WHERE USER_ID = #{userId}
+	</update>
+
 </mapper>

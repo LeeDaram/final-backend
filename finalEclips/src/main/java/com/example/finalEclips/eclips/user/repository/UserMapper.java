@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateOAuthUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
+import com.example.finalEclips.eclips.user.dto.TermsAagreementDto;
 import com.example.finalEclips.eclips.user.dto.TermsDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
 
@@ -34,5 +35,14 @@ public interface UserMapper {
 
     // 동의여부 저장하기
     void saveTermsAgreement(@Param("userId") String userId, @Param("isAgree") String isAgree);
+
+    // 동의여부 불러오기
+    TermsAagreementDto findUserIdTermsAgreement(String id);
+
+    // 사용자 정보 업데이트
+    void updateUserInfo(UserDto userDto);
+
+    // 약관 동의 업데이트
+    void updateTermsAgreement(TermsAagreementDto termsAagreementDto);
 
 }
