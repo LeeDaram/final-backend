@@ -1,1 +1,106 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.finalEclips.eclips.mypage.repository.MypageMapper">
+    
+    <!-- 리뷰 -->
+	<resultMap id="reviewResultMap" type="com.example.finalEclips.eclips.mypage.dto.ReviewDto">
+	    <id property="reviewId" column="REVIEW_ID"/>
+	    <result property="storeId" column="STORE_ID"/>
+	    <result property="userId" column="USER_ID"/>
+	    <result property="rating" column="RATING"/>
+	    <result property="content" column="CONTENT"/>
+	    <result property="reviewMenu" column="REVIEW_MENU"/>
+	    <result property="reviewPrice" column="REVIEW_PRICE"/>
+	    <result property="likeCount" column="LIKE_COUNT"/>
+	    <result property="createdAt" column="CREATED_AT"/>
+	    
+	    <collection property="reviewImg" ofType="java.lang.String">
+	        <result column="REVIEW_IMG"/>
+	    </collection>
+	    
+	    <collection property="storeName" ofType="java.lang.String">
+            <result column="STORE_NAME"/>
+        </collection>
+	</resultMap>
+	
+	<!-- 예약 -->
+	<resultMap id="activateResultMap" type="com.example.finalEclips.eclips.mypage.dto.ActivateDto">
+	    <result property="storeId" column="STORE_ID" />
+	    <result property="storeName" column="STORE_NAME" />
+	    <result property="activateDate" column="ACTIVATE_DATE" />
+	</resultMap>
+	
+	
+	<!-- 사용자 아이디 + 기간별로 리뷰 조회 -->
+	<select id="findReviewByPeriod" resultMap="reviewResultMap">
+	    SELECT R.REVIEW_ID, R.STORE_ID, R.USER_ID, R.RATING, R.CONTENT, R.REVIEW_MENU, 
+	           R.REVIEW_PRICE, R.LIKE_COUNT, R.CREATED_AT, RI.REVIEW_IMG, BU.STORE_NAME
+	    FROM REVIEW R
+	    LEFT JOIN REVIEW_IMG RI ON R.REVIEW_ID = RI.REVIEW_ID
+	    LEFT JOIN GOOD_PRICE_BUSINESS GPB ON R.STORE_ID = GPB.STORE_ID
+	    LEFT JOIN USER_TABLE U ON GPB.USER_ID = U.USER_ID
+	    LEFT JOIN BUSINESS_USER BU ON U.USER_ID = BU.USER_ID
+	    WHERE R.USER_ID = #{userId}
+	    <if test="period != 'all'">
+	        <if test="period == 'today'">
+	            AND TRUNC(R.CREATED_AT) = TRUNC(SYSDATE)
+	        </if>
+	        <if test="period == '1month'">
+	            AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -1)
+	        </if>
+	        <if test="period == '3months'">
+	            AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -3)
+	        </if>
+	        <if test="period == '6months'">
+	            AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -6)
+	        </if>
+	        <if test="period == '1year'">
+	            AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -12)
+	        </if>
+	        <if test="period == '3years'">
+	            AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -36)
+	        </if>
+	    </if>
+	    ORDER BY R.CREATED_AT DESC
+	</select>
+
+	
+	<!-- 리뷰 삭제 -->
+	<delete id="deleteReview">
+	    DELETE FROM REVIEW
+	    WHERE REVIEW_ID = #{reviewId}
+    </delete>
+
+	<delete id="deleteReviewImg">
+	    DELETE FROM REVIEW_IMG
+	    WHERE REVIEW_ID = #{reviewId}
+	</delete>
+	
+	<!-- 사용자 아이디 예약 조회 -->
+	<select id="findActivateByPeriod" resultMap="activateResultMap">
+	    SELECT A.ACTIVATE_ID, A.ACTIVATE_DATE, A.USER_ID, A.STORE_ID, A.CREATED_AT, BU.STORE_NAME
+	    FROM ACTIVATE A
+	    LEFT OUTER JOIN GOOD_PRICE_BUSINESS GPB ON A.STORE_ID = GPB.STORE_ID
+	    LEFT OUTER JOIN USER_TABLE U ON GPB.USER_ID = U.USER_ID
+	    LEFT OUTER JOIN BUSINESS_USER BU ON U.USER_ID = BU.USER_ID
+	    WHERE A.USER_ID = #{userId}
+	    <if test="period == 'future'">
+	        <![CDATA[ AND A.ACTIVATE_DATE >= TRUNC(SYSDATE) ]]>
+	    </if>
+	    <if test="period == 'past'">
+	        <![CDATA[ AND A.ACTIVATE_DATE < TRUNC(SYSDATE) ]]>
+	    </if>
+	    ORDER BY A.ACTIVATE_DATE DESC
+	</select>
+	
+	<!-- 예약 삭제 -->
+	<delete id="deleteActivate">
+	    DELETE FROM ACTIVATE
+	    WHERE ACTIVATE_ID = #{activateId}
+	</delete>
+
+
+</mapper>
