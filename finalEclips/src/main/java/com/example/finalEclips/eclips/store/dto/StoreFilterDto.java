@@ -24,4 +24,6 @@ public class StoreFilterDto {
 	private String kid;
 	private String parking;
 	private String address;
+	private float lat;
+	private float lng;
 }

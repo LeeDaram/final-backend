@@ -19,6 +19,8 @@ public class StoreDto {
     private String kid;
     private String parking;
     private String average;
+    private float lat;
+    private float lng;
     private String storeName;
     private String industryName;
     private String mainMenu;

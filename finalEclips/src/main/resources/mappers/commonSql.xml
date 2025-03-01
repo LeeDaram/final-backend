@@ -66,6 +66,8 @@
 				gpb.PARKING,
 				bu.STORE_NAME,
 				bu.ADDRESS,
+				bu.LAT,
+				bu.LNG,
 				i.INDUSTRY_NAME,
 				sgg.SIGUNGU_NAME,
 				sgg.SIGUNGU_ID ,

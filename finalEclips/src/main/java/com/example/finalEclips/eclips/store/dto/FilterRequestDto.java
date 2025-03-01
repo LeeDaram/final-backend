@@ -19,4 +19,6 @@ public class FilterRequestDto {
 	private String sidoName;
 	private String sigunguName;
 	private String industryName;
+	private float lat;
+	private float lng;
 }
