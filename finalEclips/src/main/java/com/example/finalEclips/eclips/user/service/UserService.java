@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateOAuthUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
+import com.example.finalEclips.eclips.user.dto.PasswordChangeDto;
 import com.example.finalEclips.eclips.user.dto.SignInDto;
 import com.example.finalEclips.eclips.user.dto.TermsAagreementDto;
 import com.example.finalEclips.eclips.user.dto.TermsDto;
@@ -48,5 +49,14 @@ public interface UserService {
 
     // 약관 동의 업데이트
     void updateTermsAgreement(TermsAagreementDto termsAagreementDto);
+
+    // 비밀번호 변경
+    void updatePassword(PasswordChangeDto passwordChangeDto);
+
+    // 사용자 삭제
+    void deleteUser(String userId, String password);
+
+    // 소셜 사용자 삭제
+    void deleteSocialUser(String userId);
 
 }

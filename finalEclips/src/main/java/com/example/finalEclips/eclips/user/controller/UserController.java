@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,7 @@ import com.example.finalEclips.eclips.config.jwt.TokenProvider;
 import com.example.finalEclips.eclips.helper.CookieHelper;
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
+import com.example.finalEclips.eclips.user.dto.PasswordChangeDto;
 import com.example.finalEclips.eclips.user.dto.SignInDto;
 import com.example.finalEclips.eclips.user.dto.TermsAagreementDto;
 import com.example.finalEclips.eclips.user.dto.TermsDto;
@@ -166,4 +168,36 @@ public class UserController {
         return "정보가 성공적으로 업데이트되었습니다.";
     }
 
+    // 비밀번호 변경
+    @PutMapping("/update/password")
+    public ResponseEntity<Map<String, String>> updatePassword(@RequestBody PasswordChangeDto passwordChangeDto) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            userService.updatePassword(passwordChangeDto);
+            response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            response.put("error", "비밀번호 변경 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // 회원 탈퇴
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") String userId,
+            @RequestBody PasswordChangeDto passwordRequestDTO) {
+        String password = passwordRequestDTO.getCurrentPassword();
+        userService.deleteUser(userId, password); // 서비스 메서드 호출
+        return ResponseEntity.ok().build();
+    }
+
+    // 소셜 회원탈퇴
+    @DeleteMapping("/social/delete/{id}")
+    public ResponseEntity<Void> deleteSocialUser(@PathVariable("id") String userId) {
+        userService.deleteSocialUser(userId);
+        return ResponseEntity.ok().build();
+    }
 }

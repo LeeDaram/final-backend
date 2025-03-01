@@ -16,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
+import com.example.finalEclips.eclips.common.dto.LoginType;
 import com.example.finalEclips.eclips.config.property.ErrorMessagePropertySource;
 import com.example.finalEclips.eclips.config.property.JwtPropertySource;
 
@@ -45,7 +46,7 @@ public class TokenProvider implements InitializingBean {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    public String createToken(Authentication authentication, String name) {
+    public String createToken(Authentication authentication, String name, LoginType loginType) {
         // 권한
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -54,7 +55,8 @@ public class TokenProvider implements InitializingBean {
         Date expiration = new Date(now.getTime() + (jwtPropertySource.getExpirationSeconds())); // 만료일 계산
 
         return Jwts.builder().issuedAt(now).issuer(jwtPropertySource.getIss()).subject(authentication.getName())
-                .expiration(expiration).claim(AUTH_CLAIM_KEY, authorities).claim("name", name).signWith(key).compact();
+                .expiration(expiration).claim(AUTH_CLAIM_KEY, authorities).claim("name", name)
+                .claim("loginType", loginType).signWith(key).compact();
     }
 
     public Authentication getAuthentication(String token) {
@@ -81,4 +83,5 @@ public class TokenProvider implements InitializingBean {
             throw new Exception(errorMessagePropertySource.getInvalidToken());
         }
     }
+
 }

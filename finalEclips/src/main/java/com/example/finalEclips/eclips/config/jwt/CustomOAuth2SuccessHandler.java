@@ -35,7 +35,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
             throw new UsernameNotFoundException("User not found");
         }
 
-        String token = tokenProvider.createToken(authentication, user.getName());
+        String token = tokenProvider.createToken(authentication, user.getName(), user.getLoginType());
 
         addJwtToCookie(response, token);
 

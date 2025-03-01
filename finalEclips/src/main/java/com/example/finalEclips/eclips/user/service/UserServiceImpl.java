@@ -27,6 +27,7 @@ import com.example.finalEclips.eclips.helper.SecurityHelper;
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateOAuthUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
+import com.example.finalEclips.eclips.user.dto.PasswordChangeDto;
 import com.example.finalEclips.eclips.user.dto.SignInDto;
 import com.example.finalEclips.eclips.user.dto.TermsAagreementDto;
 import com.example.finalEclips.eclips.user.dto.TermsDto;
@@ -166,7 +167,7 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
 
             UserDto user = getUser(signInDto.getUserId());
 
-            return tokenProvider.createToken(authentication, user.getName());
+            return tokenProvider.createToken(authentication, user.getName(), user.getLoginType());
         } catch (Exception ex) {
             throw new BadCredentialsException(errorMessagePropertySource.getBadCredentials());
         }
@@ -197,7 +198,6 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
 
         // 저장
         userMapper.saveOAuthUser(createOAuthUserDto);
-
     }
 
     @Override
@@ -218,7 +218,7 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
             newUser.setRole(UserRole.ROLE_USER);
             newUser.setLoginType(LoginType.SOCIAL);
             userMapper.saveOAuthUser(newUser);
-
+            saveTermsAgreement(newUser.getEmail(), "F");
             existingUser = userMapper.findUserById(email);
         }
 
@@ -252,6 +252,50 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
     // 약관 동의 정보 업데이트
     public void updateTermsAgreement(TermsAagreementDto termsAagreementDto) {
         userMapper.updateTermsAgreement(termsAagreementDto);
+    }
+
+    // 비밀번호 변경
+    @Override
+    public void updatePassword(PasswordChangeDto passwordChangeDto) {
+
+        // 사용자 정보 불러오기
+        UserDto user = userMapper.findUserById(passwordChangeDto.getUserId());
+        if (user == null) {
+            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+        }
+        if (!passwordEncoder.matches(passwordChangeDto.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("기존 비밀번호와 일치하지 않습니다.");
+        }
+
+        // 비밀번호 암호화
+        passwordChangeDto.setNewPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword()));
+
+        // 저장
+        userMapper.updatePassword(passwordChangeDto);
+    }
+
+    // 회원탈퇴
+    @Override
+    public void deleteUser(String userId, String password) {
+
+        // 사용자 정보 불러오기
+        UserDto user = userMapper.findUserById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+        }
+
+        // 비밀번호 확인
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("기존 비밀번호와 일치하지 않습니다.");
+        }
+
+        userMapper.deleteUserById(userId);
+    }
+
+    // 소셜 사용자 삭제
+    @Override
+    public void deleteSocialUser(String userId) {
+        userMapper.deleteUserById(userId);
     }
 
 }
