@@ -60,4 +60,9 @@ public class QnaServiceImpl implements QnaService{
 		
 	}
 
+	@Override
+	public List<QnaDto> getSearchQna(String search) {
+		return qnaMapper.findSearchQna(search);
+	}
+
 }

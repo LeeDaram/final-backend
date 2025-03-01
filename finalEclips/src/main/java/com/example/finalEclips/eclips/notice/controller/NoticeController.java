@@ -2,6 +2,7 @@ package com.example.finalEclips.eclips.notice.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.finalEclips.eclips.notice.dto.CreateNoticeDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto;
@@ -36,6 +40,14 @@ public class NoticeController {
 	public ResponseEntity<NoticeAttachmentDto> getNoticeAttachment(@PathVariable("id") int id){
 		return ResponseEntity.ok(noticeService.getNoticeAttachment(id));
 	}
+	// 첨부파일 업로드
+	@PostMapping("/attachments")
+    public ResponseEntity<Void> uploadFiles(
+            @RequestPart("files") List<MultipartFile> files,
+            @RequestParam("noticeId") int noticeId) {
+			  noticeService.createNoticeAttachments(noticeId, files);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 	//제목 or 내용 검색바
 	@GetMapping("/main/search/{search}")
 	public ResponseEntity<List<NoticeDto>> getSearchNotices(@PathVariable("search") String search){

@@ -61,6 +61,19 @@
 		WHERE ATTACHMENT_ID = #{attachmentId}
 	</select>
 	
+	<delete id="deleteNoticeAttachmentsByPostId">
+		DELETE FROM NOTICE_ATTACHMENTS WHERE NOTICE_ID = #{noticeId}
+	</delete>
+	
+	<insert id="saveNoticeAttachments">
+		INSERT INTO NOTICE_ATTACHMENTS
+		(NOTICE_ID, ORIGIN_FILENAME, STORED_FILENAME, CONTENT_TYPE, FILE_SIZE) VALUES
+        <foreach collection="fileDtos" item="item" separator=",">
+            (#{noticeId}, #{item.originFilename}, #{item.storedFilename}, #{item.contentType}, #{item.size})
+        </foreach>
+	</insert>
+	
+	
 	<select id="findSearchNotice" resultType="com.example.finalEclips.eclips.notice.dto.NoticeDto" resultMap="noticeResultMap">
 	SELECT
 	      NOTICE_ID, 

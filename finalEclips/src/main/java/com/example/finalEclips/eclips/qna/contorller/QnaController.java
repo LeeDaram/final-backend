@@ -41,6 +41,7 @@ public class QnaController {
 	public ResponseEntity<QnaDto> getQnaById(@PathVariable("id") int id){
 		return ResponseEntity.ok(qnaService.getQnaById(id));
 	}
+	
 	//Qna 작성
 	@PostMapping("/create")
 	public ResponseEntity<Void> createQna(@RequestBody CreateQnaDto createQnaDto){
@@ -71,6 +72,11 @@ public class QnaController {
 	public ResponseEntity<Void> deleteQnaAnswerById(@PathVariable("id") int id){
 		qnaService.deleteQnaAnswerById(id);
 		return ResponseEntity.ok().build();
+	}
+	// 제목또는 내용검색
+	@GetMapping("/main/search/{search}")
+	public ResponseEntity<List<QnaDto>> getSearchQna(@PathVariable("search") String search){
+		return ResponseEntity.ok(qnaService.getSearchQna(search));
 	}
 
 }
