@@ -67,9 +67,9 @@
 	
 	<insert id="saveNoticeAttachments">
 		INSERT INTO NOTICE_ATTACHMENTS
-		(NOTICE_ID, ORIGIN_FILENAME, STORED_FILENAME, CONTENT_TYPE, FILE_SIZE) VALUES
-        <foreach collection="fileDtos" item="item" separator=",">
-            (#{noticeId}, #{item.originFilename}, #{item.storedFilename}, #{item.contentType}, #{item.size})
+		(NOTICE_ID, ORIGIN_FILENAME, STORED_FILENAME, CONTENT_TYPE, FILE_SIZE)
+        <foreach collection="fileDtos" item="item" separator="UNION ALL">
+            SELECT #{noticeId}, #{item.originFilename}, #{item.storedFilename}, #{item.contentType}, #{item.size} FROM DUAL
         </foreach>
 	</insert>
 	
