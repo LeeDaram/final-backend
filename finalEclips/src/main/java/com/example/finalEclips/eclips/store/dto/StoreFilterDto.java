@@ -7,6 +7,7 @@ public class StoreFilterDto {
 	private int sidoId;
 	private String sidoName;
 	private int sigunguId;
+	private int storeId;
 	private String sigunguName;
 	private int industryId;
 	private String industryName;

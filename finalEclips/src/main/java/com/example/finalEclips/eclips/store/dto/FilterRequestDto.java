@@ -7,6 +7,7 @@ public class FilterRequestDto {
 	private int sidoId;
 	private int sigunguId;
 	private int industryId;
+	private int storeId;
 	private String takeout;
 	private String delivery;
 	private String wifi;

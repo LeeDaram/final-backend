@@ -151,4 +151,26 @@
 			</where>
 		) tb	 
     </sql>
+    
+    <!-- 업소상세페이지 -->
+<!--     <sql id="storeDetailSql">
+    	select ROW_NUMBER() OVER (ORDER BY g.store_id ASC) AS row_num,
+    		g.store_id as g_store_id,
+	        g.INDUSTRY_ID,
+	        g.CONTACT,
+	        g.STORE_IMAGE,
+	        g.AVERAGE_RATING,
+	        b.STORE_NAME,
+	        a.store_id as a_store_id,
+	        a.main_menu,
+	        a.price,
+	        i.INDUSTRY_NAME,
+	        sg.SIGUNGU_NAME,
+	        sd.SIDO_NAME  
+    	from GOOD_PRICE_BUSINESS g
+    	inner join review r
+    	on g.store_id = r.store_id
+    	inner join review_img ri
+    	on r.review_id = ri.review_id
+    </sql> -->
 </mapper>
