@@ -57,7 +57,6 @@ jwt:
   iss: nextit.or.kr
   sub: myapp-jwt
   expiration-milliseconds: 86400000 # 만료기한 1일
-
 cookie:
   jwt:
     name: Authorization
@@ -65,8 +64,5 @@ cookie:
     secure: false
     path: /
     maxAge: 604800
-logging:
-  level:
-    root: debug
 attachment:
   dir-path: "C://attachments"
