@@ -1,0 +1,44 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.finalEclips.eclips.averageprice.repository.AveragePriceMapper">
+
+    <!-- 평균가격 조회 -->
+    <select id="getAveragePrice" parameterType="com.example.finalEclips.eclips.averageprice.dto.AveragePriceDto" resultType="int">
+        SELECT 
+            ROUND(AVG(AM.PRICE)) AS AVG_PRICE
+        FROM 
+            APPROVAL_MANAGEMENT AM
+        JOIN 
+            GOOD_PRICE_BUSINESS GPB ON AM.STORE_ID = GPB.STORE_ID
+        JOIN 
+            USER_TABLE UT ON GPB.USER_ID = UT.USER_ID
+        JOIN 
+            BUSINESS_USER BU ON UT.USER_ID = BU.USER_ID
+        JOIN 
+            SIGUNGU SG ON BU.SIGUNGU_ID = SG.SIGUNGU_ID
+        JOIN 
+            SIDO SD ON SG.SIDO_ID = SD.SIDO_ID
+        WHERE 
+            AM.MAIN_MENU LIKE '%' || #{mainMenu} || '%'
+            AND AM.FINAL_APPROVAL_STATUS = 'APPROVED'
+            AND SD.SIDO_NAME = #{sidoName}
+    </select>
+    
+    <!-- 평균가격 조회 -->
+    <select id="findLocationByUserId" resultType="com.example.finalEclips.eclips.averageprice.dto.LocationDto">
+        SELECT 
+            S.SIDO_NAME AS sidoName,
+            G.SIGUNGU_NAME AS sigunguName
+        FROM 
+            BUSINESS_USER BU
+        JOIN 
+            SIGUNGU G ON BU.SIGUNGU_ID = G.SIGUNGU_ID
+        JOIN 
+            SIDO S ON G.SIDO_ID = S.SIDO_ID
+        WHERE 
+            BU.USER_ID = #{userId}
+    </select>
+
+</mapper>
