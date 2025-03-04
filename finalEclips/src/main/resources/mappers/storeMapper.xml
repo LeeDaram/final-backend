@@ -5,6 +5,7 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.finalEclips.eclips.store.repository.StoreMapper">
+
     <select id="findAllStore" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
         select store_id, 
                 user_id,
@@ -23,18 +24,66 @@
          from GOOD_PRICE_BUSINESS
     </select>
         
-        <select id="findPaginatedStores" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
+    <select id="findPaginatedStores" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
         SELECT t.*
         FROM (
             <include refid="CommonSql.storePaginationSql" />
         ) t
-        <include refid="CommonSql.paginationWhere" />
+        <include refid="CommonSql.paginationWhere" />       
     </select>
-
-        <select id="findPaginatedStoresCount" resultType="int">
+    
+    <select id="findPaginatedStoresCount" resultType="int">
             SELECT count(*)
             FROM (
                 <include refid="CommonSql.storePaginationSql" />
             ) t
-        </select>
+    </select>
+    
+    <select id="findSidoName" resultType="com.example.finalEclips.eclips.store.dto.SidoDto">
+    	SELECT SIDO_ID,
+			   SIDO_NAME 
+		FROM SIDO
+    </select>
+    
+    <select id="findSigunguName" resultType="com.example.finalEclips.eclips.store.dto.SigunguDto">
+    	SELECT SIGUNGU_ID,
+    		   SIDO_ID,
+			   SIGUNGU_NAME
+		FROM SIGUNGU
+    </select>
+    
+    <select id="findIndustryName" resultType="com.example.finalEclips.eclips.store.dto.IndustryDto">
+    	SELECT INDUSTRY_ID,
+			   INDUSTRY_NAME 
+		FROM INDUSTRY
+    </select>
+    
+    <select id="filterStore" resultType="com.example.finalEclips.eclips.store.dto.StoreFilterDto">
+		select t.*
+		from(
+			<include refid="CommonSql.filterPaginationSql" />
+		) t
+		
+		
+		<include refid="CommonSql.paginationWhere" />
+		
+    </select>
+    
+    <select id="filterStoreCount" resultType="int">
+    	    SELECT count(*)
+            FROM (
+                <include refid="CommonSql.filterPaginationSql" />
+            ) t
+    </select>
+    
+    <select id="findAllAddress" resultType="com.example.finalEclips.eclips.store.dto.StoreAddressDto">
+    	select *
+    	from BUSINESS_USER
+    </select>
+
+	<!-- 업소상세페이지 -->    
+<!--     <select id="findAllStoreDetail" resultType="com.example.finalEclips.eclips.store.dto.StoreDetailDto">
+    	
+    </select> -->
+
 </mapper>

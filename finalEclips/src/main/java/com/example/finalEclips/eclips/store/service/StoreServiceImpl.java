@@ -7,7 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.finalEclips.eclips.common.dto.PaginationDto;
+import com.example.finalEclips.eclips.store.dto.FilterRequestDto;
+import com.example.finalEclips.eclips.store.dto.IndustryDto;
+import com.example.finalEclips.eclips.store.dto.SidoDto;
+import com.example.finalEclips.eclips.store.dto.SigunguDto;
+import com.example.finalEclips.eclips.store.dto.StoreAddressDto;
 import com.example.finalEclips.eclips.store.dto.StoreDto;
+import com.example.finalEclips.eclips.store.dto.StoreFilterDto;
 import com.example.finalEclips.eclips.store.dto.StoreRequestDto;
 import com.example.finalEclips.eclips.store.repository.StoreMapper;
 
@@ -28,5 +34,34 @@ public class StoreServiceImpl implements StoreService {
         
         return new PageImpl<>(content, pageable, totalCount);
     }
+
+	@Override
+	public List<SidoDto> getSido() {
+		return storeMapper.findSidoName();
+	}
+
+	@Override
+	public List<SigunguDto> getSigungu() {
+		return storeMapper.findSigunguName();
+	}
+
+	@Override
+	public List<IndustryDto> getIndustry() {
+		return storeMapper.findIndustryName();
+	}
+
+	@Override
+	public PageImpl<StoreFilterDto> getStoreFilter(FilterRequestDto filterRequestDto, Pageable pageable) {
+        PaginationDto<?> paginationDto = PaginationDto.builder().data(filterRequestDto).pageable(pageable).build();
+        List<StoreFilterDto> content = storeMapper.filterStore(paginationDto);
+        int totalCount = storeMapper.filterStoreCount(paginationDto);
+		
+        return new PageImpl<>(content, pageable, totalCount);
+	}
+
+	@Override
+	public List<StoreAddressDto> getAllAddress() {
+		return storeMapper.findAllAddress();
+	}
     
 }
