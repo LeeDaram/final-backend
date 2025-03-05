@@ -26,13 +26,22 @@
         </collection>
 	</resultMap>
 	
-	<!-- 예약 -->
-	<resultMap id="activateResultMap" type="com.example.finalEclips.eclips.mypage.dto.ActivateDto">
+	
+	<!-- 예약 : 사용자 관점-->
+	<resultMap id="activateResultMap" type="com.example.finalEclips.eclips.mypage.dto.UserActivateDto">
 	    <result property="storeId" column="STORE_ID" />
 	    <result property="storeName" column="STORE_NAME" />
 	    <result property="activateDate" column="ACTIVATE_DATE" />
 	</resultMap>
 	
+	<!-- 예약 : 업소관점 -->
+    <resultMap id="storeActivateResultMap" type="com.example.finalEclips.eclips.mypage.dto.StoreActivateDto">
+        <result property="userId" column="USER_ID"/>
+        <result property="activateDate" column="ACTIVATE_DATE"/>
+        <result property="name" column="NAME"/>
+        <result property="phoneNumber" column="PHONE_NUMBER"/>
+        <result property="storeName" column="STORE_NAME"/>
+    </resultMap>
 	
 	<!-- 사용자 아이디 + 기간별로 리뷰 조회 -->
 	<select id="findReviewByPeriod" resultMap="reviewResultMap">
@@ -66,7 +75,7 @@
 	    </if>
 	    ORDER BY R.CREATED_AT DESC
 	</select>
-
+	
 	
 	<!-- 리뷰 삭제 -->
 	<delete id="deleteReview">
@@ -78,6 +87,7 @@
 	    DELETE FROM REVIEW_IMG
 	    WHERE REVIEW_ID = #{reviewId}
 	</delete>
+	
 	
 	<!-- 사용자 아이디 예약 조회 -->
 	<select id="findActivateByPeriod" resultMap="activateResultMap">
@@ -96,11 +106,183 @@
 	    ORDER BY A.ACTIVATE_DATE DESC
 	</select>
 	
+	
 	<!-- 예약 삭제 -->
 	<delete id="deleteActivate">
 	    DELETE FROM ACTIVATE
 	    WHERE ACTIVATE_ID = #{activateId}
 	</delete>
 
+
+    <!-- 사업자 : 등록 신청 결과 조회 -->
+    <select id="findApproval" resultType="com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto">
+	    SELECT BU.STORE_NAME, AM.PRICE_APPROVAL, AM.CLEANLINESS_APPROVAL, AM.FINAL_APPROVAL_STATUS, AM.UPDATED_AT
+        FROM APPROVAL_MANAGEMENT AM
+        JOIN GOOD_PRICE_BUSINESS GPB ON AM.STORE_ID = GPB.STORE_ID
+        JOIN USER_TABLE UT ON GPB.USER_ID = UT.USER_ID
+        JOIN BUSINESS_USER BU ON UT.USER_ID = BU.USER_ID
+        WHERE UT.USER_ID = #{userId}
+    </select>
+    
+    <!-- 사업자 : 재신청 조회 -->
+    <select id="findStoreRegisterInfo" resultType="com.example.finalEclips.eclips.mypage.dto.StoreRegisterDto">
+        SELECT 
+		    am.MAIN_MENU, 
+		    am.PRICE, 
+		    gpb.CONTACT, 
+		    gpb.INDUSTRY_ID, 
+		    gpb.TAKEOUT, 
+		    gpb.DELIVERY, 
+		    gpb.WIFI, 
+		    gpb.PET, 
+		    gpb.KID, 
+		    gpb.PARKING, 
+		    ar.IS_ACTIVATE
+		FROM 
+		    APPROVAL_MANAGEMENT am
+		JOIN 
+		    GOOD_PRICE_BUSINESS gpb ON am.STORE_ID = gpb.STORE_ID
+		JOIN 
+		    USER_TABLE ut ON gpb.USER_ID = ut.USER_ID
+		JOIN 
+		    BUSINESS_USER bu ON ut.USER_ID = bu.USER_ID
+		JOIN 
+		    ACTIVATE_RESERVATION ar ON am.STORE_ID = ar.STORE_ID
+		WHERE 
+		    ut.USER_ID = #{userId}
+    </select>
+    
+    <!-- 사업자 : 업소정보 조회 -->
+    <select id="findStoreInfo" resultType="com.example.finalEclips.eclips.mypage.dto.StoreEditDto">
+        SELECT 
+		    bu.STORE_NAME, 
+		    bu.BUSINESS_REG_NO, 
+		    bu.ADDRESS, 
+		    am.MAIN_MENU, 
+		    am.PRICE, 
+		    ar.IS_ACTIVATE
+		FROM 
+		    APPROVAL_MANAGEMENT am
+		JOIN 
+		    GOOD_PRICE_BUSINESS gpb ON am.STORE_ID = gpb.STORE_ID
+		JOIN 
+		    USER_TABLE ut ON gpb.USER_ID = ut.USER_ID
+		JOIN 
+		    BUSINESS_USER bu ON ut.USER_ID = bu.USER_ID
+		JOIN 
+		    ACTIVATE_RESERVATION ar ON am.STORE_ID = ar.STORE_ID
+		WHERE 
+		    ut.USER_ID = #{userId}
+    </select>
+
+    <!-- 사업자 : 예약 활성화 업데이트  -->
+    <update id="updateStoreInfo" parameterType="com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto">
+	    UPDATE ACTIVATE_RESERVATION ar
+	    SET ar.IS_ACTIVATE = #{isActivate},
+	        ar.UPDATED_AT = SYSDATE
+	    WHERE ar.STORE_ID = (
+	        SELECT gpb.STORE_ID
+	        FROM GOOD_PRICE_BUSINESS gpb
+	        JOIN USER_TABLE ut ON gpb.USER_ID = ut.USER_ID
+	        WHERE gpb.USER_ID = #{userId}
+	    )
+	</update>
+	
+	<!-- 사업자 : 예약 조회 -->
+    <select id="findStoreActivateByPeriod" resultMap="storeActivateResultMap">
+        SELECT
+            A.ACTIVATE_ID, 
+            A.USER_ID,
+            A.ACTIVATE_DATE,
+            U.NAME,
+            U.PHONE_NUMBER,
+            A.STORE_ID
+        FROM ACTIVATE A
+        JOIN GOOD_PRICE_BUSINESS GPB ON A.STORE_ID = GPB.STORE_ID
+        JOIN USER_TABLE U ON A.USER_ID = U.USER_ID
+        JOIN BUSINESS_USER BU ON GPB.USER_ID = BU.USER_ID
+        WHERE GPB.USER_ID = #{userId}
+		<if test="period == 'future'">
+            <![CDATA[ AND A.ACTIVATE_DATE >= TRUNC(SYSDATE) ]]>
+            ORDER BY A.ACTIVATE_DATE ASC
+        </if>
+        <if test="period == 'past'">
+            <![CDATA[ AND A.ACTIVATE_DATE < TRUNC(SYSDATE) ]]>
+            ORDER BY A.ACTIVATE_DATE DESC
+        </if>
+    </select>
+    
+    <!-- 승인관리 리스트 -->
+    <select id="findApprovalManagementList" resultType="com.example.finalEclips.eclips.mypage.dto.ApprovalListDto">
+		SELECT 
+		    am.STORE_ID,
+		    bu.STORE_NAME,
+		    am.MAIN_MENU,
+		    s.SIDO_NAME,
+		    am.PRICE,
+		    am.FINAL_APPROVAL_STATUS,
+		    am.UPDATED_AT
+		FROM 
+		    APPROVAL_MANAGEMENT am
+		JOIN 
+		    GOOD_PRICE_BUSINESS gpb ON am.STORE_ID = gpb.STORE_ID
+		JOIN 
+		    USER_TABLE ut ON gpb.USER_ID = ut.USER_ID
+		JOIN 
+		    BUSINESS_USER bu ON bu.USER_ID = gpb.USER_ID
+		JOIN 
+		    SIGUNGU sg ON bu.SIGUNGU_ID = sg.SIGUNGU_ID
+		JOIN 
+		    SIDO s ON sg.SIDO_ID = s.SIDO_ID
+		WHERE
+		   <choose>
+	            <when test="status == 'ALL'">
+	                1 = 1
+	            </when>
+	            <otherwise>
+	                am.FINAL_APPROVAL_STATUS = #{status}
+	            </otherwise>
+	        </choose>
+		ORDER BY
+		    am.UPDATED_AT DESC
+    </select>
+    
+    <!-- 승인관리 상세모달 -->
+    <select id="findModalStoreInfo" resultType="com.example.finalEclips.eclips.mypage.dto.StoreInfoDto">
+        SELECT 
+		    AM.MAIN_MENU,
+		    AM.PRICE,
+		    AM.STORE_IMAGE,
+		    AM.PRICE_APPROVAL,
+		    AM.CLEANLINESS_APPROVAL,
+		    AM.FINAL_APPROVAL_STATUS,
+		    BU.BUSINESS_REG_NO,
+		    BU.STORE_NAME,
+		    BU.ADDRESS,
+		    S.SIDO_NAME,
+		    SG.SIGUNGU_NAME,
+		    AM.STORE_ID
+		FROM 
+		    APPROVAL_MANAGEMENT AM
+		JOIN 
+		    GOOD_PRICE_BUSINESS GPB ON AM.STORE_ID = GPB.STORE_ID
+		JOIN 
+		    USER_TABLE UT ON GPB.USER_ID = UT.USER_ID
+		JOIN 
+		    BUSINESS_USER BU ON UT.USER_ID = BU.USER_ID
+		JOIN 
+		    SIGUNGU SG ON BU.SIGUNGU_ID = SG.SIGUNGU_ID
+		JOIN 
+		    SIDO S ON SG.SIDO_ID = S.SIDO_ID
+		WHERE 
+		    AM.STORE_ID = #{storeId}
+    </select>
+    
+    <!-- 승인 반려 상태값 변경 -->
+    <update id="updateApprovalStatusToPending" parameterType="com.example.finalEclips.eclips.mypage.dto.StoreInfoDto">
+        UPDATE APPROVAL_MANAGEMENT
+		SET FINAL_APPROVAL_STATUS = #{finalApprovalStatus}
+		WHERE STORE_ID = #{storeId}
+    </update>
 
 </mapper>
