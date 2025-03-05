@@ -12,6 +12,7 @@ import com.example.finalEclips.eclips.store.dto.StoreAddressDto;
 import com.example.finalEclips.eclips.store.dto.StoreDetailDto;
 import com.example.finalEclips.eclips.store.dto.StoreDto;
 import com.example.finalEclips.eclips.store.dto.StoreFilterDto;
+import com.example.finalEclips.eclips.store.dto.StoreRequestDetailDto;
 
 @Mapper
 public interface StoreMapper {
@@ -24,4 +25,5 @@ public interface StoreMapper {
     int filterStoreCount(PaginationDto<?> paginationDto); // 필터 총 페이지 카운트
     List<StoreAddressDto> findAllAddress(); // 주소
     List<StoreDetailDto> findAllStoreDetail(); // 업소상세페이지
+    void saveActivate(StoreRequestDetailDto storeRequestDetailDto); // 업소상페이지 예약
 }

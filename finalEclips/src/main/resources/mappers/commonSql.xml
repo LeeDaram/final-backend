@@ -3,44 +3,12 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 		<mapper namespace="CommonSql">
-	<sql id="storePaginationSql">
-               SELECT ROW_NUMBER() OVER (ORDER BY g.store_id ASC) AS row_num,
-                    g.store_id as g_store_id,
-                    g.user_id,
-                    g.INDUSTRY_ID,
-                    g.CONTACT,
-                    g.STORE_IMAGE,
-                    g.AVERAGE_RATING,
-                    g.TAKEOUT,
-                    g.DELIVERY,
-                    g.WIFI,
-                    g.PET,
-                    g.KID,
-                    g.PARKING,
-                    b.STORE_NAME,
-                    a.store_id as a_store_id,
-                    a.main_menu,
-                    a.price,
-                    i.INDUSTRY_NAME,
-                    sg.SIGUNGU_NAME,
-                    sd.SIDO_NAME 
-               FROM GOOD_PRICE_BUSINESS g
-               JOIN BUSINESS_USER b
-               ON g.USER_ID = b.USER_ID
-               JOIN APPROVAL_MANAGEMENT a
-               ON g.store_id = a.store_id
-               JOIN INDUSTRY i 
-               ON g.INDUSTRY_ID = i.INDUSTRY_ID
-               JOIN SIGUNGU sg
-               ON b.SIGUNGU_ID = sg.SIGUNGU_ID 
-               JOIN SIDO sd
-               ON sg.SIDO_ID = sd.SIDO_ID
-    </sql>
-
+	<!-- 페이지네이션 처리 -->
     <sql id="paginationWhere">
         <![CDATA[WHERE row_num >= #{pageable.offset} + 1 AND row_num <= #{pageable.offset} + #{pageable.pageSize}]]>
     </sql>
     
+    <!-- 업소 목록 페이지(추천/평점순) -->
     <sql id="filterPaginationSql">
 		SELECT 
 			tb.*,
@@ -48,7 +16,7 @@
 				ROW_NUMBER() OVER (ORDER BY like_count DESC, store_name) AS row_num
 			</if>
 			<if test="data.sort == 1">
-				ROW_NUMBER() OVER (ORDER BY average_rating DESC, store_name) AS row_num
+				ROW_NUMBER() OVER (ORDER BY review_avg DESC, store_name) AS row_num
 			</if>
 		FROM (
 			SELECT
@@ -57,7 +25,6 @@
 				gpb.INDUSTRY_ID,
 				gpb.CONTACT,
 				gpb.STORE_IMAGE,
-				gpb.AVERAGE_RATING,
 				gpb.TAKEOUT,
 				gpb.DELIVERY,
 				gpb.WIFI,
@@ -74,11 +41,14 @@
 				sd.SIDO_NAME,
 				am.price,
 				am.main_menu,
-				(
-					SELECT NVL(SUM(LIKE_COUNT), 0) 
-					FROM review
-					WHERE store_id = gpb.store_id 
-				) AS like_count
+				(SELECT NVL(SUM(LIKE_COUNT), 0) FROM review WHERE store_id = gpb.store_id ) AS like_count,
+				(SELECT count(*) FROM REVIEW r WHERE r.STORE_ID = GPB.STORE_ID ) AS review_count,
+			    (SELECT AVG(rating) FROM REVIEW r  WHERE r.STORE_ID = GPB.STORE_ID ) AS review_avg,
+				(SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 5) AS rating_5_count,
+			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 4) AS rating_4_count,
+			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 3) AS rating_3_count,
+			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 2) AS rating_2_count,
+			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 1) AS rating_1_count
 			FROM user_table ut
 			INNER JOIN BUSINESS_USER bu
 			ON ut.USER_ID = bu.USER_ID
@@ -153,24 +123,23 @@
     </sql>
     
     <!-- 업소상세페이지 -->
-<!--     <sql id="storeDetailSql">
-    	select ROW_NUMBER() OVER (ORDER BY g.store_id ASC) AS row_num,
-    		g.store_id as g_store_id,
-	        g.INDUSTRY_ID,
-	        g.CONTACT,
-	        g.STORE_IMAGE,
-	        g.AVERAGE_RATING,
-	        b.STORE_NAME,
-	        a.store_id as a_store_id,
-	        a.main_menu,
-	        a.price,
-	        i.INDUSTRY_NAME,
-	        sg.SIGUNGU_NAME,
-	        sd.SIDO_NAME  
-    	from GOOD_PRICE_BUSINESS g
-    	inner join review r
-    	on g.store_id = r.store_id
-    	inner join review_img ri
-    	on r.review_id = ri.review_id
-    </sql> -->
+    <sql id="storeDetailSql">
+	  SELECT   GPB.INDUSTRY_ID, 
+			   GPB.AVERAGE_RATING ,
+			   r.REVIEW_ID ,
+			   r.STORE_ID ,
+			   r.USER_ID ,
+			   r.RATING ,
+			   r.CONTENT ,
+			   r.REVIEW_PRICE ,
+			   r.LIKE_COUNT ,
+			   r.CREATED_AT ,
+			   r.REVIEW_MENU ,
+			   ri.REVIEW_IMG 
+		FROM GOOD_PRICE_BUSINESS gpb 
+		INNER JOIN REVIEW r 
+		ON GPB.STORE_ID = r.STORE_ID 
+		INNER JOIN REVIEW_IMG ri  
+		ON r.REVIEW_ID = ri.REVIEW_ID
+    </sql>
 </mapper>

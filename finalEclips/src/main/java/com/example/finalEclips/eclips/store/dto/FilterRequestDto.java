@@ -22,4 +22,5 @@ public class FilterRequestDto {
 	private String industryName;
 	private float lat;
 	private float lng;
+	
 }

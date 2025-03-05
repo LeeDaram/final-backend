@@ -12,8 +12,10 @@ import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
 import com.example.finalEclips.eclips.store.dto.StoreAddressDto;
+import com.example.finalEclips.eclips.store.dto.StoreDetailDto;
 import com.example.finalEclips.eclips.store.dto.StoreDto;
 import com.example.finalEclips.eclips.store.dto.StoreFilterDto;
+import com.example.finalEclips.eclips.store.dto.StoreRequestDetailDto;
 import com.example.finalEclips.eclips.store.dto.StoreRequestDto;
 import com.example.finalEclips.eclips.store.repository.StoreMapper;
 
@@ -62,6 +64,17 @@ public class StoreServiceImpl implements StoreService {
 	@Override
 	public List<StoreAddressDto> getAllAddress() {
 		return storeMapper.findAllAddress();
+	}
+
+	@Override
+	public List<StoreDetailDto> getAllStoreDetail() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void createActivate(StoreRequestDetailDto storeRequestDetailDto) {
+		storeMapper.saveActivate(storeRequestDetailDto);
 	}
     
 }

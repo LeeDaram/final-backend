@@ -5,46 +5,14 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.finalEclips.eclips.store.repository.StoreMapper">
-
-    <select id="findAllStore" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
-        select store_id, 
-                user_id,
-                industry_id, 
-                contact, 
-                store_image,
-                average_rating,
-                takeout,
-                delivery,
-                wifi,
-                pet,
-                kid,
-                parking,
-                created_at,
-                updated_at
-         from GOOD_PRICE_BUSINESS
-    </select>
-        
-    <select id="findPaginatedStores" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
-        SELECT t.*
-        FROM (
-            <include refid="CommonSql.storePaginationSql" />
-        ) t
-        <include refid="CommonSql.paginationWhere" />       
-    </select>
-    
-    <select id="findPaginatedStoresCount" resultType="int">
-            SELECT count(*)
-            FROM (
-                <include refid="CommonSql.storePaginationSql" />
-            ) t
-    </select>
-    
+    <!-- 시도 -->
     <select id="findSidoName" resultType="com.example.finalEclips.eclips.store.dto.SidoDto">
     	SELECT SIDO_ID,
 			   SIDO_NAME 
 		FROM SIDO
     </select>
     
+    <!-- 시군구 -->
     <select id="findSigunguName" resultType="com.example.finalEclips.eclips.store.dto.SigunguDto">
     	SELECT SIGUNGU_ID,
     		   SIDO_ID,
@@ -52,23 +20,23 @@
 		FROM SIGUNGU
     </select>
     
+    <!-- 업종명 -->
     <select id="findIndustryName" resultType="com.example.finalEclips.eclips.store.dto.IndustryDto">
     	SELECT INDUSTRY_ID,
 			   INDUSTRY_NAME 
 		FROM INDUSTRY
     </select>
     
+    <!-- 업소 목록 페이지네이션 -->
     <select id="filterStore" resultType="com.example.finalEclips.eclips.store.dto.StoreFilterDto">
 		select t.*
 		from(
 			<include refid="CommonSql.filterPaginationSql" />
 		) t
-		
-		
 		<include refid="CommonSql.paginationWhere" />
-		
     </select>
     
+    <!-- 업소 총 페이지 개수 -->
     <select id="filterStoreCount" resultType="int">
     	    SELECT count(*)
             FROM (
@@ -76,14 +44,37 @@
             ) t
     </select>
     
+    <!-- 주소 -->
     <select id="findAllAddress" resultType="com.example.finalEclips.eclips.store.dto.StoreAddressDto">
     	select *
     	from BUSINESS_USER
     </select>
 
 	<!-- 업소상세페이지 -->    
-<!--     <select id="findAllStoreDetail" resultType="com.example.finalEclips.eclips.store.dto.StoreDetailDto">
-    	
-    </select> -->
-
+    <select id="findAllStoreDetail" resultType="com.example.finalEclips.eclips.store.dto.StoreDetailDto">
+       SELECT  GPB.INDUSTRY_ID, 
+			   GPB.AVERAGE_RATING ,
+			   r.REVIEW_ID ,
+			   r.STORE_ID ,
+			   r.USER_ID ,
+			   r.RATING ,
+			   r.CONTENT ,
+			   r.REVIEW_PRICE ,
+			   r.LIKE_COUNT ,
+			   r.CREATED_AT ,
+			   r.REVIEW_PRICE ,
+			   r.REVIEW_MENU ,
+			   ri.REVIEW_IMG 
+		FROM GOOD_PRICE_BUSINESS gpb 
+		INNER JOIN REVIEW r 
+		ON GPB.STORE_ID = r.STORE_ID 
+		INNER JOIN REVIEW_IMG ri  
+		ON r.REVIEW_ID = ri.REVIEW_ID
+    </select> 
+    
+    <!-- 업소상세페이지 예약 -->
+    <insert id="saveActivate">
+    	insert into ACTIVATE(USER_ID, STORE_ID, ACTIVATE_DATE) value(#{userId}, #{storeId}, #{reservationDate})
+    </insert>
+    
 </mapper>

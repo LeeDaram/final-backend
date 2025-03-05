@@ -8,11 +8,14 @@ import lombok.Data;
 public class StoreDetailDto {
     private int storeId;
     private int reviewId;
-    private int userId;
+    private String userId;
     private int rating;
     private String content;
     private String reviewMenu;
     private int price;
     private int likeCount;
+    private int reviewCount;
+    private float rationgCount;
+    private String img;
     private LocalDate createdAt;
 }
