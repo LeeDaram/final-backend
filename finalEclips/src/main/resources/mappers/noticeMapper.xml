@@ -47,6 +47,19 @@
 		LEFT OUTER JOIN NOTICE_ATTACHMENTS na ON n.notice_id = na.notice_id
 		ORDER BY n.IS_MAIN_NOTICE DESC, n.CREATED_AT DESC
 	</select>
+	<select id="findNoticeAttachmentsByNoticeId" resultType="com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto">
+    SELECT
+          ATTACHMENT_ID,
+          NOTICE_ID,
+          ORIGIN_FILENAME,
+          STORED_FILENAME,
+          CONTENT_TYPE,
+          FILE_SIZE,
+          CREATED_AT
+    FROM NOTICE_ATTACHMENTS
+    WHERE NOTICE_ID = #{noticeId}
+	</select>
+	
 	
 	<select id="findNoticeAttachmentById" resultType="com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto">
 		SELECT
@@ -114,9 +127,17 @@
 	DELETE NOTICE WHERE notice_id = #{id}
 	</delete>
 	
-	<insert id="saveNotice">
+	<!-- <insert id="saveNotice">
 	INSERT INTO NOTICE (TITLE, CONTENT, IS_MAIN_NOTICE)
 	VALUES( #{title}, #{content}, #{isMainNotice})
+	</insert> -->
+	
+	<insert id="saveNotice" parameterType="com.example.finalEclips.eclips.notice.dto.CreateNoticeDto">
+    <selectKey keyProperty="noticeId" resultType="int" order="BEFORE">
+        SELECT notice_id_seq.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO NOTICE (NOTICE_ID, TITLE, CONTENT, IS_MAIN_NOTICE)
+    VALUES (#{noticeId}, #{title}, #{content}, #{isMainNotice})
 	</insert>
 	
 	

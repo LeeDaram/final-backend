@@ -1,7 +1,11 @@
 package com.example.finalEclips.eclips.notice.controller;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -74,9 +78,25 @@ public class NoticeController {
 	}
 	//공지사항 작성
 	@PostMapping("/create")
-	public ResponseEntity<Void> createNotice(@RequestBody CreateNoticeDto createNoticeDto){
-		noticeService.createNotice(createNoticeDto);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<Map<String, Integer>> createNotice(@RequestBody CreateNoticeDto createNoticeDto) {
+	    int noticeId = noticeService.createNotice(createNoticeDto);
+	    Map<String, Integer> response = new HashMap<>();
+	    response.put("id", noticeId); //프론트로 id값 반환해서 공지사항 먼져 작성후 올라간 id값에 첨부파일 업로드
+	    return ResponseEntity.ok(response);
 	}
-	
+	// 첨부파일 조회
+	@GetMapping("/attachment/img/{id}/download")
+	public ResponseEntity<Resource> downloadNoticeAttachment(@PathVariable("id") int id) throws IOException {
+		return noticeService.downloadNoticeAttachmentResource(id);
+    }
+	// 공지사항별 첨부파일 정보 조회
+	@GetMapping("/attachment/{noticeId}/download")
+	public ResponseEntity<List<NoticeAttachmentDto>> getNoticeAttachments(@PathVariable("noticeId") int noticeId) {
+	    List<NoticeAttachmentDto> attachments = noticeService.getNoticeAttachmentsByNoticeId(noticeId);
+	    if (attachments == null || attachments.isEmpty()) {
+//	        return ResponseEntity.notFound().build();
+	    	
+	    }
+	    return ResponseEntity.ok(attachments);
+	}
 }

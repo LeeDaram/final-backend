@@ -51,8 +51,8 @@ public class StoreController {
  	@GetMapping("/stores")
  	public ResponseEntity<PageImpl<StoreFilterDto>> getFilterStore(FilterRequestDto filterRequestDto,
  			 @PageableDefault(size = 8, page = 0) Pageable pageable){
- 		System.out.println("/stores");
- 		System.out.println(filterRequestDto);
+// 		System.out.println("/stores");
+// 		System.out.println(filterRequestDto);
  		return ResponseEntity.ok(storeService.getStoreFilter(filterRequestDto, pageable));
  	}
  	

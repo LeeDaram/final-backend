@@ -26,4 +26,5 @@ public interface NoticeMapper {
 	void deleteNoticeById(int id); // 공지사항 삭제
 	void saveNotice(CreateNoticeDto createNoticeDto); // 공지사항 쓰기
 	void incrementViewCount(int id); // 조회수
+	List<NoticeAttachmentDto> findNoticeAttachmentsByNoticeId(int noticeId); //파일조회
 }
