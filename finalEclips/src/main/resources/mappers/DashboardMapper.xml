@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.finalEclips.eclips.dashboard.repository.DashboardMapper">
+
+    <!-- 업종별 착한가격업소 현황 -->
+    <select id="selectIndustryStatus" resultType="com.example.finalEclips.eclips.dashboard.dto.IndustryGroupCountDto">
+        SELECT 
+		    GPB.INDUSTRY_ID, 
+		    I.INDUSTRY_NAME, 
+		    COUNT(*) AS INDUSTRY_COUNT
+		FROM 
+		    GOOD_PRICE_BUSINESS GPB
+		JOIN 
+		    INDUSTRY I ON GPB.INDUSTRY_ID = I.INDUSTRY_ID
+		JOIN 
+		    APPROVAL_MANAGEMENT AM ON GPB.STORE_ID = AM.STORE_ID
+		WHERE 
+		    AM.FINAL_APPROVAL_STATUS = 'APPROVED'
+		GROUP BY 
+		    GPB.INDUSTRY_ID, I.INDUSTRY_NAME
+		ORDER BY 
+		    INDUSTRY_COUNT DESC
+    </select>
+
+     <!-- 시도별 착한가격업소 현황 -->
+     <select id="selectSidoStatus" resultType="com.example.finalEclips.eclips.dashboard.dto.SidoGroupCountDto">
+	     SELECT 
+		    S.SIDO_ID,
+		    S.SIDO_NAME,
+		    COUNT(AM.STORE_ID) AS APPROVAL_COUNT
+		FROM 
+		    APPROVAL_MANAGEMENT AM
+		JOIN 
+		    GOOD_PRICE_BUSINESS GPB ON AM.STORE_ID = GPB.STORE_ID
+		JOIN 
+		    USER_TABLE U ON GPB.USER_ID = U.USER_ID
+		JOIN 
+		    BUSINESS_USER BU ON U.USER_ID = BU.USER_ID
+		JOIN 
+		    SIGUNGU SG ON BU.SIGUNGU_ID = SG.SIGUNGU_ID
+		JOIN 
+		    SIDO S ON SG.SIDO_ID = S.SIDO_ID
+		WHERE 
+		    AM.FINAL_APPROVAL_STATUS = 'APPROVED'
+		GROUP BY 
+		    S.SIDO_NAME, S.SIDO_ID
+		ORDER BY 
+		    S.SIDO_ID ASC
+     </select>
+     
+     <!-- 년도별 착한 가격업소 현황 -->
+     <select id="selectYearStatus" resultType="com.example.finalEclips.eclips.dashboard.dto.YearGroupCountDto">
+        SELECT 
+		    EXTRACT(YEAR FROM UPDATED_AT) AS YEAR,
+		    COUNT(*) AS COUNT
+		FROM 
+		    APPROVAL_MANAGEMENT AM
+		WHERE 
+		    AM.FINAL_APPROVAL_STATUS = 'APPROVED'
+		GROUP BY 
+		    EXTRACT(YEAR FROM UPDATED_AT)
+		ORDER BY 
+		    YEAR
+     </select>
+     
+     <!-- 월별 착한 가격업소 현황 -->
+     <select id="selectMonthStatus" resultType="com.example.finalEclips.eclips.dashboard.dto.MonthGroupCountDto">
+        SELECT 
+		    TO_CHAR(UPDATED_AT, 'YYYY-MM') AS year_month,  
+		    COUNT(*) AS count  
+		FROM 
+		    APPROVAL_MANAGEMENT
+		GROUP BY 
+		    TO_CHAR(UPDATED_AT, 'YYYY-MM')  
+		ORDER BY 
+		    year_month
+     </select>
+     
+     <!-- 권한별 착한가격업소 현황 -->
+     <select id="selectUserStatus" resultType="com.example.finalEclips.eclips.dashboard.dto.UserGroupCountDto">
+        SELECT "ROLE", COUNT(*) AS role_count
+		FROM USER_TABLE
+		WHERE "ROLE" IN ('ROLE_USER', 'ROLE_BIZ')
+		GROUP BY "ROLE"
+     </select>
+     
+</mapper>
