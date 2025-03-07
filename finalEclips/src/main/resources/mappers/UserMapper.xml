@@ -96,4 +96,11 @@
         WHERE USER_ID = #{userId}
     </delete>
 
+    <!-- 비밀번호 찾기 : 사용자 조회 -->
+    <select id="findUserPw" resultType="com.example.finalEclips.eclips.user.dto.UserDto">
+        SELECT USER_ID, EMAIL, NAME
+		FROM USER_TABLE
+		WHERE USER_ID = #{userId} AND NAME = #{name} AND EMAIL = #{email}
+    </select>
+
 </mapper>

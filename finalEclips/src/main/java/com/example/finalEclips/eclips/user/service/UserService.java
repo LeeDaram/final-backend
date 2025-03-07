@@ -59,4 +59,7 @@ public interface UserService {
     // 소셜 사용자 삭제
     void deleteSocialUser(String userId);
 
+    // 비밀번호 찾기
+    boolean resetPassword(String userId, String name, String email);
+
 }

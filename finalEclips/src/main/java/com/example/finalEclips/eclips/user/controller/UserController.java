@@ -26,6 +26,7 @@ import com.example.finalEclips.eclips.helper.CookieHelper;
 import com.example.finalEclips.eclips.user.dto.CreateBizUserDto;
 import com.example.finalEclips.eclips.user.dto.CreateUserDto;
 import com.example.finalEclips.eclips.user.dto.PasswordChangeDto;
+import com.example.finalEclips.eclips.user.dto.PwReissue;
 import com.example.finalEclips.eclips.user.dto.SignInDto;
 import com.example.finalEclips.eclips.user.dto.TermsAagreementDto;
 import com.example.finalEclips.eclips.user.dto.TermsDto;
@@ -200,4 +201,22 @@ public class UserController {
         userService.deleteSocialUser(userId);
         return ResponseEntity.ok().build();
     }
+
+    // 비밀번호 찾기
+    @PostMapping("/reset/password")
+    public ResponseEntity<String> resetPassword(@RequestBody PwReissue pwReissue) {
+        try {
+            boolean success = userService.resetPassword(pwReissue.getUserId(), pwReissue.getName(),
+                    pwReissue.getEmail());
+
+            if (success) {
+                return ResponseEntity.ok("임시 비밀번호가 이메일로 전송되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("비밀번호 재설정 중 오류 발생");
+        }
+    }
+
 }

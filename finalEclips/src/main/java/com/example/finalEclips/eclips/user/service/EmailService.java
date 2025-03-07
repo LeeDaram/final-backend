@@ -100,4 +100,27 @@ public class EmailService {
         verificationCache.remove(email);
         verifiedEmails.remove(email);
     }
+
+    // 새 비밀번호 전송
+    public void sendTempPassword(String email, String tempPassword) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        message.setFrom(fromEmail);
+        message.setRecipients(MimeMessage.RecipientType.TO, email);
+        message.setSubject("착한녀석들 - 임시 비밀번호 안내");
+
+        String emailContent = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>"
+                + "<h2 style='color: #4CAF50; text-align: center;'>임시 비밀번호 안내</h2>"
+                + "<p style='font-size: 16px; color: #333;'>안녕하세요! 착한녀석들 서비스를 이용해 주셔서 감사합니다.<br>"
+                + "아래의 임시 비밀번호로 로그인 후 반드시 비밀번호를 변경해주세요.</p>"
+                + "<div style='text-align: center; padding: 15px; background: #f4f4f4; border-radius: 5px; font-size: 24px; font-weight: bold; color: #333;'>"
+                + tempPassword + "</div>" + "<p style='font-size: 14px; color: #777;'>* 임시 비밀번호는 보안을 위해 빠르게 변경해주세요.</p>"
+                + "<hr style='border: 0; border-top: 1px solid #ddd;'>"
+                + "<p style='font-size: 12px; color: #999; text-align: center;'>ⓒ 2025 착한녀석들. All rights reserved.</p>"
+                + "</div>";
+
+        message.setContent(emailContent, "text/html; charset=utf-8");
+
+        mailSender.send(message);
+    }
+
 }

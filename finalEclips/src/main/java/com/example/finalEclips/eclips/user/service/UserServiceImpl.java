@@ -3,6 +3,7 @@ package com.example.finalEclips.eclips.user.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,6 +35,7 @@ import com.example.finalEclips.eclips.user.dto.TermsDto;
 import com.example.finalEclips.eclips.user.dto.UserDto;
 import com.example.finalEclips.eclips.user.repository.UserMapper;
 
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -296,6 +298,69 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
     @Override
     public void deleteSocialUser(String userId) {
         userMapper.deleteUserById(userId);
+    }
+
+    // 비밀번호 발급
+    private String generateTempPassword() {
+        StringBuilder tempPassword = new StringBuilder();
+        Random rnd = new Random();
+
+        // 대소문자, 숫자, 특수문자 각 1개씩 넣기
+        tempPassword.append("abcdefghijklmnopqrstuvwxyz".charAt(rnd.nextInt(26))); // 소문자
+        tempPassword.append("ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(rnd.nextInt(26))); // 대문자
+        tempPassword.append("0123456789".charAt(rnd.nextInt(10))); // 숫자
+        tempPassword.append("!@#$%^&*".charAt(rnd.nextInt(8))); // 특수문자
+
+        // 나머지 6자리 랜덤 문자 추가 (대소문자, 숫자, 특수문자 포함)
+        String allChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        for (int i = 0; i < 6; i++) {
+            tempPassword.append(allChars.charAt(rnd.nextInt(allChars.length())));
+        }
+
+        // 비밀번호 섞기
+        return shuffleString(tempPassword.toString());
+    }
+
+    // 문자열 섞기
+    private String shuffleString(String str) {
+        Random rnd = new Random();
+        StringBuilder shuffled = new StringBuilder(str);
+        for (int i = 0; i < str.length(); i++) {
+            int j = rnd.nextInt(str.length());
+            char temp = shuffled.charAt(i);
+            shuffled.setCharAt(i, shuffled.charAt(j));
+            shuffled.setCharAt(j, temp);
+        }
+        return shuffled.toString();
+    }
+
+    @Override
+    public boolean resetPassword(String userId, String name, String email) {
+
+        // 사용자 존재 확인
+        UserDto user = userMapper.findUserPw(userId, name, email);
+        if (user == null) {
+            return false;
+        }
+
+        // 임시 비밀번호 생성
+        String tempPassword = generateTempPassword();
+
+        // 비밀번호 암호화 후 저장
+        PasswordChangeDto passwordChangeDto = new PasswordChangeDto();
+        passwordChangeDto.setUserId(user.getUserId());
+        passwordChangeDto.setNewPassword(passwordEncoder.encode(tempPassword));
+        userMapper.updatePassword(passwordChangeDto);
+
+        // 이메일로 임시 비밀번호 전송
+        try {
+            emailService.sendTempPassword(email, tempPassword);
+        } catch (MessagingException e) {
+            System.err.println("이메일 전송 실패: " + e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
 }
