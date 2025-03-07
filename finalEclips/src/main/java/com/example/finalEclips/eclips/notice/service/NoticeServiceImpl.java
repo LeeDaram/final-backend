@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.util.List;
 
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,10 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.finalEclips.eclips.common.dto.FileDto;
+import com.example.finalEclips.eclips.common.dto.PaginationDto;
 import com.example.finalEclips.eclips.helper.FileHelper;
 import com.example.finalEclips.eclips.notice.dto.CreateNoticeDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeDto;
+import com.example.finalEclips.eclips.notice.dto.NoticeRequestDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeUpdateDto;
 import com.example.finalEclips.eclips.notice.repository.NoticeMapper;
 
@@ -105,6 +109,14 @@ public class NoticeServiceImpl implements NoticeService {
 	@Override
 	public List<NoticeAttachmentDto> getNoticeAttachmentsByNoticeId(int noticeId) {
 		return noticeMapper.findNoticeAttachmentsByNoticeId(noticeId);
+	}
+
+	@Override
+	public PageImpl<NoticeDto> getNoticesPage(NoticeRequestDto noticeRequestDto, Pageable pageable) {
+		PaginationDto<?> paginationDto = PaginationDto.builder().data(noticeRequestDto).pageable(pageable).build();
+		List<NoticeDto> content = noticeMapper.findPaginatedNotices(paginationDto);
+		int totalCount = noticeMapper.findPaginatedNoticesCount(paginationDto);
+		return new PageImpl<>(content, pageable, totalCount);
 	}	
 
 }

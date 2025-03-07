@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.example.finalEclips.eclips.common.dto.FileDto;
+import com.example.finalEclips.eclips.common.dto.PaginationDto;
 import com.example.finalEclips.eclips.notice.dto.CreateNoticeDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeDto;
@@ -27,4 +28,8 @@ public interface NoticeMapper {
 	void saveNotice(CreateNoticeDto createNoticeDto); // 공지사항 쓰기
 	void incrementViewCount(int id); // 조회수
 	List<NoticeAttachmentDto> findNoticeAttachmentsByNoticeId(int noticeId); //파일조회
+	
+	//페이지네이션
+	List<NoticeDto> findPaginatedNotices(PaginationDto<?> paginationDto);
+	int findPaginatedNoticesCount(PaginationDto<?> paginationDto);
 }

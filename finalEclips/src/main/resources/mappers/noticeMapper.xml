@@ -102,7 +102,7 @@
 	ORDER BY IS_MAIN_NOTICE DESC, CREATED_AT DESC
 	</select>
 	
-	<select id="findNoticeById" resultType="com.example.finalEclips.eclips.notice.dto.NoticeUpdateDto" resultMap="noticeResultMap">
+	<select id="findNoticeById" resultMap="noticeResultMap">
 	SELECT
 	      NOTICE_ID, 
 	      TITLE, 
@@ -146,4 +146,47 @@
         SET VIEWS = VIEWS + 1
         WHERE NOTICE_ID = #{id}
     </update>
+    
+    <!-- 페이지네이션 -->
+    <select id="findPaginatedNotices" resultType="com.example.finalEclips.eclips.notice.dto.NoticePaginationDto">
+		SELECT t2.*,
+		       (SELECT COUNT(*) FROM notice_attachments WHERE notice_id = t2.notice_id) AS attachments_count
+		FROM (
+			SELECT t1.*
+			FROM (
+				SELECT
+				      ROW_NUMBER() OVER (ORDER BY is_main_notice DESC, created_at DESC) AS row_num,
+				      notice_id,
+				      title,
+				      content,
+				      is_main_notice,
+				      created_at,
+				      updated_at,
+				      views AS views
+				FROM NOTICE n
+			) t1
+			<include refid="CommonSql.paginationWhere" />
+		) t2	
+	</select>
+	
+	<select id="findPaginatedNoticesCount" resultType="int">
+		SELECT COUNT(*)
+		FROM (
+			SELECT t1.*
+			FROM (
+				SELECT
+				      ROW_NUMBER() OVER (ORDER BY is_main_notice DESC, created_at DESC) AS row_num,
+				      notice_id,
+				      title,
+				      content,
+				      is_main_notice,
+				      created_at,
+				      updated_at,
+				      views AS views
+				FROM NOTICE n
+			) t1
+			
+		) t2
+    </select>
+    
 </mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.finalEclips.eclips.home.repository.HomeMapper">
+
+	<select id="findAllLikeCount">
+       	SELECT 
+            gpb.industry_id, 
+            gpb.contact, 
+            gpb.average_rating,
+            gpb.takeout,
+            gpb.delivery,
+            gpb.wifi,
+            gpb.pet,
+            gpb.kid,
+            gpb.parking,
+            gpb.STORE_ID,
+            gpb.USER_ID,
+            gpb.STORE_IMAGE,
+            bu.LAT,
+            bu.LNG,
+            bu.STORE_NAME,
+            bu.ADDRESS,
+            bu.USER_ID AS BU_USER_ID,
+            AVG(r.LIKE_COUNT) AS likeCount,
+            i.INDUSTRY_NAME,
+            sgg.SIGUNGU_NAME,
+            sgg.SIGUNGU_ID,
+            sd.SIDO_NAME,
+            am.price,
+            am.main_menu
+        FROM user_table ut
+        INNER JOIN BUSINESS_USER bu ON ut.USER_ID = bu.USER_ID
+        INNER JOIN SIGUNGU sgg ON bu.SIGUNGU_ID = sgg.SIGUNGU_ID
+        INNER JOIN SIDO sd ON sgg.SIDO_ID = sd.SIDO_ID
+        INNER JOIN GOOD_PRICE_BUSINESS gpb ON ut.USER_ID = gpb.USER_ID
+        INNER JOIN INDUSTRY i ON gpb.INDUSTRY_ID = i.INDUSTRY_ID 
+        INNER JOIN APPROVAL_MANAGEMENT am ON gpb.store_id = am.store_id
+        INNER JOIN REVIEW r ON r.STORE_ID = gpb.STORE_ID
+        GROUP BY 
+            gpb.industry_id, 
+            gpb.contact, 
+            gpb.average_rating,
+            gpb.takeout,
+            gpb.delivery,
+            gpb.wifi,
+            gpb.pet,
+            gpb.kid,
+            gpb.parking,
+            gpb.STORE_ID,
+            gpb.USER_ID,
+            gpb.STORE_IMAGE,
+            bu.LAT,
+            bu.LNG,
+            bu.ADDRESS,
+            bu.STORE_NAME,
+            bu.USER_ID,
+            i.INDUSTRY_NAME,
+            sgg.SIGUNGU_NAME,
+            sgg.SIGUNGU_ID,
+            sd.SIDO_NAME,
+            am.price,
+            am.main_menu
+        ORDER BY AVG(r.LIKE_COUNT) DESC
+        FETCH FIRST 10 ROWS ONLY
+	</select>
+	
+	<select id="findAllMainCount">
+	SELECT
+  		  (SELECT COUNT(*) FROM USER_TABLE)      AS total_user_count,
+  		  (SELECT COUNT(*) FROM REVIEW)          AS total_review_count,
+  		  (SELECT COUNT(*) FROM BUSINESS_USER)   AS total_store_count
+	FROM DUAL
+	</select>
+	
+	<select id="findAllMainNotice">
+	SELECT notice_id, title as noticeTitle, content as noticeContent, created_at, is_main_notice 
+	FROM notice
+	WHERE is_main_notice = 'T'
+	ORDER BY created_at DESC
+	FETCH FIRST 3 ROWS ONLY
+	</select>
+
+</mapper>

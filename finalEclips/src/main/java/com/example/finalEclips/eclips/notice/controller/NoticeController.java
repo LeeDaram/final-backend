@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.finalEclips.eclips.notice.dto.CreateNoticeDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeDto;
+import com.example.finalEclips.eclips.notice.dto.NoticeRequestDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeUpdateDto;
 import com.example.finalEclips.eclips.notice.service.NoticeService;
 
@@ -39,6 +43,14 @@ public class NoticeController {
 	public ResponseEntity<List<NoticeDto>> getNotice() {
 		return ResponseEntity.ok(noticeService.getNotices());
 	}
+	// 공지사항 페이지네이션
+	@GetMapping("/main/pagination")
+	public ResponseEntity<PageImpl<NoticeDto>> getNoticesPage(
+			NoticeRequestDto noticeRequestDto,
+			@PageableDefault(size = 8, page = 0) Pageable pageable
+			){
+		return ResponseEntity.ok(noticeService.getNoticesPage(noticeRequestDto, pageable));
+				}
 	//각 게시물 첨부파일 조회
 	@GetMapping("/attachments/{id}")
 	public ResponseEntity<NoticeAttachmentDto> getNoticeAttachment(@PathVariable("id") int id){

@@ -66,3 +66,7 @@ cookie:
     maxAge: 604800
 attachment:
   dir-path: "C://attachments"
+logging:
+  level:
+    root: debug
+    

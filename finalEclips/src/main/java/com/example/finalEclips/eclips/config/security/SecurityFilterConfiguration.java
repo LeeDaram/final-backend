@@ -45,7 +45,6 @@ public class SecurityFilterConfiguration {
 //                .requestMatchers("/", "/login/**", "/oauth2/**", "/api/users/**", "/api/email/**", "/api/mypage/**",
 //                        "/api/approval")
 //                .permitAll()
-
                 // 역할
                 .requestMatchers("/api/users/personal/**").hasRole("USER").requestMatchers("/api/users/biz/**")
                 .hasRole("BIZ").requestMatchers("/api/users/admin/**").hasRole("ADMIN")
