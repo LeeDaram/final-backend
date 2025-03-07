@@ -37,6 +37,7 @@
                ON sg.SIDO_ID = sd.SIDO_ID
     </sql>
 
+    <!-- 페이지네이션 조건 -->
     <sql id="paginationWhere">
         <![CDATA[WHERE row_num >= #{pageable.offset} + 1 AND row_num <= #{pageable.offset} + #{pageable.pageSize}]]>
     </sql>
@@ -152,25 +153,47 @@
 		) tb	 
     </sql>
     
-    <!-- 업소상세페이지 -->
-<!--     <sql id="storeDetailSql">
-    	select ROW_NUMBER() OVER (ORDER BY g.store_id ASC) AS row_num,
-    		g.store_id as g_store_id,
-	        g.INDUSTRY_ID,
-	        g.CONTACT,
-	        g.STORE_IMAGE,
-	        g.AVERAGE_RATING,
-	        b.STORE_NAME,
-	        a.store_id as a_store_id,
-	        a.main_menu,
-	        a.price,
-	        i.INDUSTRY_NAME,
-	        sg.SIGUNGU_NAME,
-	        sd.SIDO_NAME  
-    	from GOOD_PRICE_BUSINESS g
-    	inner join review r
-    	on g.store_id = r.store_id
-    	inner join review_img ri
-    	on r.review_id = ri.review_id
-    </sql> -->
+    <!-- 리뷰 목록 조회 (페이지네이션 포함) -->
+    <sql id="reviewBaseQuery">
+	    SELECT ROW_NUMBER() OVER (ORDER BY R.CREATED_AT DESC) AS row_num,
+               R.REVIEW_ID, 
+               R.STORE_ID, 
+               R.USER_ID, 
+               R.RATING, 
+               R.CONTENT, 
+               R.REVIEW_MENU, 
+               R.REVIEW_PRICE, 
+               R.LIKE_COUNT, 
+               R.CREATED_AT, 
+               BU.STORE_NAME
+        FROM REVIEW R
+        LEFT JOIN GOOD_PRICE_BUSINESS GPB ON R.STORE_ID = GPB.STORE_ID
+        LEFT JOIN USER_TABLE U ON GPB.USER_ID = U.USER_ID
+        LEFT JOIN BUSINESS_USER BU ON U.USER_ID = BU.USER_ID
+	    WHERE R.USER_ID = #{userId, jdbcType=VARCHAR}
+	    
+	    <if test="period != 'all'">
+	        <if test="period == 'today'">
+	            AND TRUNC(R.CREATED_AT) = TRUNC(SYSDATE)
+	        </if>
+	        <if test="period == '1month'">
+	            AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -1)
+	        </if>
+	        <if test="period == '3months'">
+	            AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -3)
+	        </if>
+	        <if test="period == '6months'">
+	            AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -6)
+	        </if>
+	        <if test="period == '1year'">
+	            AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -12)
+	        </if>
+	        <if test="period == '3years'">
+	            AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -36)
+	        </if>
+	    </if>
+	</sql>
+
+
+
 </mapper>

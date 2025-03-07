@@ -3,6 +3,8 @@ package com.example.finalEclips.eclips.mypage.service;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
 import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
@@ -17,7 +19,8 @@ import com.example.finalEclips.eclips.mypage.dto.UserActivateDto;
 public interface MypageService {
 
     // 사용자 아이디 + 기간별로 리뷰 조회
-    List<ReviewDto> getReviewByPeriod(String userId, String period);
+    Page<ReviewDto> getReviewByPeriod(@Param("userId") String userId, @Param("period") String period,
+            Pageable pageable);
 
     // 리뷰 삭제
     void deleteReview(int reviewId);

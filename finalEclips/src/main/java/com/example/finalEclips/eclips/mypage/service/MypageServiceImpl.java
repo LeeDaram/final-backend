@@ -2,10 +2,14 @@ package com.example.finalEclips.eclips.mypage.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
 import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
+import com.example.finalEclips.eclips.mypage.dto.PaginationDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreActivateDto;
@@ -25,8 +29,15 @@ public class MypageServiceImpl implements MypageService {
 
     // 사용자 아이디 + 기간별로 리뷰 조회
     @Override
-    public List<ReviewDto> getReviewByPeriod(String userId, String period) {
-        return mypageMapper.findReviewByPeriod(userId, period);
+    public Page<ReviewDto> getReviewByPeriod(String userId, String period, Pageable pageable) {
+
+        PaginationDto<?> paginationDto = PaginationDto.builder().userId(userId).period(period).pageable(pageable)
+                .build();
+
+        List<ReviewDto> content = mypageMapper.findReviewByPeriod(paginationDto);
+        int totalCount = mypageMapper.countReviewByPeriod(userId, period);
+
+        return new PageImpl<>(content, pageable, totalCount);
     }
 
     // 리뷰 삭제

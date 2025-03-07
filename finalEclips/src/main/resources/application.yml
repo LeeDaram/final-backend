@@ -63,6 +63,6 @@ cookie:
     http-only: false
     secure: false
     path: /
-    maxAge: 604800
+    maxAge: 86400000
 attachment:
   dir-path: "C://attachments"

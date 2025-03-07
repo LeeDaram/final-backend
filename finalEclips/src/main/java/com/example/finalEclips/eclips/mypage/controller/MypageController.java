@@ -2,6 +2,8 @@ package com.example.finalEclips.eclips.mypage.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,11 +35,10 @@ public class MypageController {
     private final MypageService mypageService;
 
     // 사용자 아이디 + 기간별로 리뷰 조회
-    @GetMapping("/review/{userId}/filter")
-    public ResponseEntity<List<ReviewDto>> getReviewByPeriod(@PathVariable("userId") String userId,
-            @RequestParam("period") String period) {
-        List<ReviewDto> reviews = mypageService.getReviewByPeriod(userId, period);
-        return ResponseEntity.ok(reviews);
+    @GetMapping("/review/{userId}/filter/{period}")
+    public Page<ReviewDto> getUserReviewsByPeriod(@PathVariable("userId") String userId,
+            @PathVariable("period") String period, Pageable pageable) {
+        return mypageService.getReviewByPeriod(userId, period, pageable);
     }
 
     // 리뷰 삭제

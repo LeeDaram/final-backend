@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
 import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
+import com.example.finalEclips.eclips.mypage.dto.PaginationDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreActivateDto;
@@ -18,8 +19,11 @@ import com.example.finalEclips.eclips.mypage.dto.UserActivateDto;
 @Mapper
 public interface MypageMapper {
 
-    // 사용자 아이디 + 기간별로 리뷰 조회
-    List<ReviewDto> findReviewByPeriod(@Param("userId") String userId, @Param("period") String period);
+    // 페이지네이션된 리뷰 목록 조회
+    List<ReviewDto> findReviewByPeriod(PaginationDto<?> paginationDto);
+
+    // 전체 리뷰 개수 조회
+    int countReviewByPeriod(@Param("userId") String userId, @Param("period") String period);
 
     // 리뷰 삭제
     void deleteReview(int reviewId);

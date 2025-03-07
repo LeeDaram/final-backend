@@ -2,6 +2,7 @@ package com.example.finalEclips.eclips.mypage.dto;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import lombok.Data;
@@ -19,6 +20,13 @@ public class ReviewDto {
     private int likeCount;
     private LocalDate createdAt;
     private String storeName;
+
     private List<String> reviewImg = new ArrayList<>();
+
+    public void setReviewImgIds(String reviewImgIds) {
+        if (reviewImgIds != null && !reviewImgIds.isEmpty()) {
+            this.reviewImg = Arrays.asList(reviewImgIds.split(","));
+        }
+    }
 
 }
