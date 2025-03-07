@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 public class StoreRequestDetailDto {
 	private String userId;
-	private int StoreId;
+	private int storeId;
 	private LocalDate reservationDate;
 }

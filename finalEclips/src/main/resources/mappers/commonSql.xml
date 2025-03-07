@@ -8,6 +8,25 @@
         <![CDATA[WHERE row_num >= #{pageable.offset} + 1 AND row_num <= #{pageable.offset} + #{pageable.pageSize}]]>
     </sql>
     
+    <sql id="storeReviewPaginationSql">
+    	select t.*
+		from(
+			SELECT
+				ROW_NUMBER() OVER (ORDER BY like_count DESC, store_id) AS row_num, 
+				review_id,
+				store_id,
+				user_id ,
+				rating ,
+				content ,
+				review_menu ,
+				like_count ,
+				review_price ,
+				created_at
+			FROM review
+			WHERE store_id = #{data.storeId}
+		) t
+    </sql>
+    
     <!-- 업소 목록 페이지(추천/평점순) -->
     <sql id="filterPaginationSql">
 		SELECT 
@@ -43,7 +62,7 @@
 				am.main_menu,
 				(SELECT NVL(SUM(LIKE_COUNT), 0) FROM review WHERE store_id = gpb.store_id ) AS like_count,
 				(SELECT count(*) FROM REVIEW r WHERE r.STORE_ID = GPB.STORE_ID ) AS review_count,
-			    (SELECT AVG(rating) FROM REVIEW r  WHERE r.STORE_ID = GPB.STORE_ID ) AS review_avg,
+			    (SELECT TRUNC(AVG(rating),1) FROM REVIEW r  WHERE r.STORE_ID = GPB.STORE_ID ) AS review_avg,
 				(SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 5) AS rating_5_count,
 			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 4) AS rating_4_count,
 			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 3) AS rating_3_count,
