@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finalEclips.eclips.config.jwt.TokenDto;
@@ -164,7 +165,6 @@ public class UserController {
 
         userService.updateUserInfo(userDto);
         userService.updateTermsAgreement(termsAgreementDto);
-        System.out.println("받은 데이터: " + request);
 
         return "정보가 성공적으로 업데이트되었습니다.";
     }
@@ -200,6 +200,14 @@ public class UserController {
     public ResponseEntity<Void> deleteSocialUser(@PathVariable("id") String userId) {
         userService.deleteSocialUser(userId);
         return ResponseEntity.ok().build();
+    }
+
+    // 아이디 찾기
+    @GetMapping("/findUserId")
+    public ResponseEntity<UserDto> getUserByName(@RequestParam("name") String name,
+            @RequestParam("email") String email) {
+        UserDto userId = userService.getUserByName(name, email);
+        return ResponseEntity.ok(userId);
     }
 
     // 비밀번호 찾기

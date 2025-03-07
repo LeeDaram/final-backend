@@ -27,4 +27,10 @@ public class CreateBizUserDto extends CreateUserDto {
     @NotNull
     private String sigunguName;
 
+    @NotNull
+    private String lat;
+
+    @NotNull
+    private String lng;
+
 }

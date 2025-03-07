@@ -140,8 +140,6 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
         createBizUserDto.setLoginType(LoginType.LOCAL);
 
         // 시도/시군구 ID 조회
-        System.out.println("sidoName: " + createBizUserDto.getSidoName());
-        System.out.println("sigunguName: " + createBizUserDto.getSigunguName());
         Integer sigunguId = userMapper.findSigunguId(createBizUserDto.getSidoName(), createBizUserDto.getSigunguName());
 
         if (sigunguId == null) {
@@ -298,6 +296,12 @@ public class UserServiceImpl implements UserService, OAuth2UserService<OAuth2Use
     @Override
     public void deleteSocialUser(String userId) {
         userMapper.deleteUserById(userId);
+    }
+
+    // 아이디 찾기
+    @Override
+    public UserDto getUserByName(String name, String email) {
+        return userMapper.findUserByName(name, email);
     }
 
     // 비밀번호 발급

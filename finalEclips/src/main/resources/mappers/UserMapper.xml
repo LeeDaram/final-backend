@@ -43,8 +43,8 @@
     
     <!-- 회원가입 - 사업자 -->
     <insert id="saveBizUser">
-        INSERT INTO BUSINESS_USER (USER_ID, BUSINESS_REG_NO, STORE_NAME, ADDRESS, SIGUNGU_ID)
-        VALUES (#{userId}, #{businessRegNo}, #{storeName}, #{address}, #{sigunguId})
+        INSERT INTO BUSINESS_USER (USER_ID, BUSINESS_REG_NO, STORE_NAME, ADDRESS, SIGUNGU_ID, LAT, LNG)
+        VALUES (#{userId}, #{businessRegNo}, #{storeName}, #{address}, #{sigunguId}, #{lat}, #{lng})
     </insert>
     
     <!-- 약관 불러오기 -->
@@ -70,7 +70,7 @@
 	<update id="updateUserInfo" parameterType="com.example.finalEclips.eclips.user.dto.UserDto">
 	    UPDATE USER_TABLE
 	    SET
-	        PHONE_NUMBER = COALESCE(NULLIF(#{phoneNumber, jdbcType=VARCHAR}, ''), PHONE_NUMBER),
+	        PHONE_NUMBER = NULLIF(#{phoneNumber, jdbcType=VARCHAR}, ''),
 	        EMAIL = COALESCE(NULLIF(#{email, jdbcType=VARCHAR}, ''), EMAIL),
 	        UPDATED_AT = CURRENT_TIMESTAMP
 	    WHERE USER_ID = #{userId}
@@ -95,6 +95,13 @@
         DELETE FROM USER_TABLE
         WHERE USER_ID = #{userId}
     </delete>
+    
+    <!-- 아이디찾기 -->
+    <select id="findUserByName" resultType="com.example.finalEclips.eclips.user.dto.UserDto">
+	    SELECT USER_ID
+		FROM USER_TABLE
+		WHERE NAME = #{name} AND EMAIL = #{email}
+    </select>
 
     <!-- 비밀번호 찾기 : 사용자 조회 -->
     <select id="findUserPw" resultType="com.example.finalEclips.eclips.user.dto.UserDto">

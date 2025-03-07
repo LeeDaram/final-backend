@@ -52,6 +52,9 @@ public interface UserMapper {
     // 사용자 삭제
     void deleteUserById(String id);
 
+    // 아이디 찾기
+    UserDto findUserByName(@Param("name") String name, @Param("email") String email);
+
     // 비밀번호 찾기
     UserDto findUserPw(@Param("userId") String userId, @Param("name") String name, @Param("email") String email);
 }

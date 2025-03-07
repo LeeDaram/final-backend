@@ -44,8 +44,8 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
     private void addJwtToCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("Authorization", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setHttpOnly(false);
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(Math.toIntExact(jwtPropertySource.getExpirationSeconds()));
         response.addCookie(cookie);
