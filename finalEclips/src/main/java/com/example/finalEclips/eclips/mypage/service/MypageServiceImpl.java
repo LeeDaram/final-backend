@@ -2,7 +2,9 @@ package com.example.finalEclips.eclips.mypage.service;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -92,10 +94,33 @@ public class MypageServiceImpl implements MypageService {
         mypageMapper.updateStoreInfo(reservationActivateDto);
     }
 
-    // 사업자 : 예약 조회
+    // 사업자 : 기간별 예약 조회 (페이지네이션 포함)
     @Override
-    public List<StoreActivateDto> getStoreActivateByPeriod(String userId, String period) {
-        return mypageMapper.findStoreActivateByPeriod(userId, period);
+    public Map<String, Object> getStoreActivateByPeriod(String userId, String period, Pageable pageable) {
+        // 전체 개수 조회
+        int totalElements = mypageMapper.countStoreActivateByPeriod(userId, period);
+
+        // 페이징된 데이터 조회
+        List<StoreActivateDto> storeActivates = mypageMapper.findStoreActivateByPeriod(userId, period, pageable);
+
+        // 응답 객체 구성
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", storeActivates);
+
+        Map<String, Object> pageInfo = new HashMap<>();
+        pageInfo.put("size", pageable.getPageSize()); // 한 페이지에 보여줄 개수
+        pageInfo.put("number", pageable.getPageNumber()); // 현재 페이지 번호
+        pageInfo.put("totalElements", totalElements); // 전체 개수
+        pageInfo.put("totalPages", (int) Math.ceil((double) totalElements / pageable.getPageSize())); // 총 페이지 수
+
+        response.put("page", pageInfo);
+        return response;
+    }
+
+    // 사업자 : 기간별 예약 수 조회
+    @Override
+    public int getStoreActivateCountByPeriod(String userId, String period) {
+        return mypageMapper.countStoreActivateByPeriod(userId, period);
     }
 
     // 승인관리 리스트

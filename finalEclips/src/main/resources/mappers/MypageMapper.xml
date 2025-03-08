@@ -179,31 +179,53 @@
 	</update>
 	
 	
-	<!-- 사업자 : 예약 조회 -->
-    <select id="findStoreActivateByPeriod" resultMap="storeActivateResultMap">
-        SELECT
-            A.ACTIVATE_ID, 
-            A.USER_ID,
-            A.ACTIVATE_DATE,
-            U.NAME,
-            U.PHONE_NUMBER,
-            A.STORE_ID
-        FROM ACTIVATE A
-        JOIN GOOD_PRICE_BUSINESS GPB ON A.STORE_ID = GPB.STORE_ID
-        JOIN USER_TABLE U ON A.USER_ID = U.USER_ID
-        JOIN BUSINESS_USER BU ON GPB.USER_ID = BU.USER_ID
-        WHERE GPB.USER_ID = #{userId}
-		<if test="period == 'future'">
-            <![CDATA[ AND A.ACTIVATE_DATE >= TRUNC(SYSDATE) ]]>
-            ORDER BY A.ACTIVATE_DATE ASC
-        </if>
-        <if test="period == 'past'">
-            <![CDATA[ AND A.ACTIVATE_DATE < TRUNC(SYSDATE) ]]>
-            ORDER BY A.ACTIVATE_DATE DESC
-        </if>
-    </select>
-    
-    
+	<!-- 전체 예약 수 조회 -->
+	<select id="countStoreActivateByPeriod" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM ACTIVATE A
+	    JOIN GOOD_PRICE_BUSINESS GPB ON A.STORE_ID = GPB.STORE_ID
+	    JOIN USER_TABLE U ON A.USER_ID = U.USER_ID
+	    JOIN BUSINESS_USER BU ON GPB.USER_ID = BU.USER_ID
+	    WHERE GPB.USER_ID = #{userId}
+	    <if test="period == 'future'">
+	        <![CDATA[ AND A.ACTIVATE_DATE >= TRUNC(SYSDATE) ]]>
+	    </if>
+	    <if test="period == 'past'">
+	        <![CDATA[ AND A.ACTIVATE_DATE < TRUNC(SYSDATE) ]]>
+	    </if>
+	</select>
+
+    <!-- 사업자 : 예약 조회 -->
+	<select id="findStoreActivateByPeriod" resultMap="storeActivateResultMap">
+	    <![CDATA[
+	    SELECT * FROM (
+	        SELECT
+	            A.ACTIVATE_ID, 
+	            A.USER_ID,
+	            A.ACTIVATE_DATE,
+	            U.NAME,
+	            U.PHONE_NUMBER,
+	            A.STORE_ID,
+	            ROW_NUMBER() OVER (ORDER BY A.ACTIVATE_DATE ASC) AS row_num
+	        FROM ACTIVATE A
+	        JOIN GOOD_PRICE_BUSINESS GPB ON A.STORE_ID = GPB.STORE_ID
+	        JOIN USER_TABLE U ON A.USER_ID = U.USER_ID
+	        JOIN BUSINESS_USER BU ON GPB.USER_ID = BU.USER_ID
+	        WHERE GPB.USER_ID = #{userId}
+	    ]]>
+	    <if test="period == 'future'">
+	        <![CDATA[ AND A.ACTIVATE_DATE >= TRUNC(SYSDATE) ]]>
+	    </if>
+	    <if test="period == 'past'">
+	        <![CDATA[ AND A.ACTIVATE_DATE < TRUNC(SYSDATE) ]]>
+	    </if>
+	    <![CDATA[
+	    ) paginated_results
+	    WHERE row_num BETWEEN #{pageable.offset} + 1 AND #{pageable.offset} + #{pageable.pageSize}
+	    ]]>
+	</select>
+
+
     <!-- 승인관리 리스트 -->
     <select id="findApprovalManagementList" resultType="com.example.finalEclips.eclips.mypage.dto.ApprovalListDto">
 		SELECT 

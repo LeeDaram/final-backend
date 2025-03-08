@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.Pageable;
 
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
 import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
@@ -47,8 +48,12 @@ public interface MypageMapper {
     // 사업자 : 예약 활성화 업데이트
     void updateStoreInfo(ReservationActivateDto reservationActivateDto);
 
-    // 사업자 : 예약 조회
-    List<StoreActivateDto> findStoreActivateByPeriod(@Param("userId") String userId, @Param("period") String period);
+    // 사업자 : 기간별 예약 조회 (페이지네이션 포함)
+    List<StoreActivateDto> findStoreActivateByPeriod(@Param("userId") String userId, @Param("period") String period,
+            @Param("pageable") Pageable pageable);
+
+    // 사업자 : 기간별 예약 수 조회
+    int countStoreActivateByPeriod(@Param("userId") String userId, @Param("period") String period);
 
     // 승인관리 리스트
     List<ApprovalListDto> findApprovalManagementList(@Param("status") String status);

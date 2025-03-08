@@ -2,9 +2,11 @@ package com.example.finalEclips.eclips.mypage.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +23,6 @@ import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
-import com.example.finalEclips.eclips.mypage.dto.StoreActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreEditDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreInfoDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreRegisterDto;
@@ -98,12 +99,13 @@ public class MypageController {
         }
     }
 
-    // 사업자 아이디 + 기간별로 리뷰 조회
+    // 사업자 아이디 + 기간별로 예약현황 조회
     @GetMapping("/store/activate/{userId}/filter")
-    public ResponseEntity<List<StoreActivateDto>> getStoreActivateByPeriod(@PathVariable("userId") String userId,
-            @RequestParam("period") String period) {
-        List<StoreActivateDto> reviews = mypageService.getStoreActivateByPeriod(userId, period);
-        return ResponseEntity.ok(reviews);
+    public ResponseEntity<?> getStoreActivateByPeriod(@PathVariable("userId") String userId,
+            @RequestParam("period") String period, @RequestParam("page") int page, @RequestParam("size") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Map<String, Object> response = mypageService.getStoreActivateByPeriod(userId, period, pageable);
+        return ResponseEntity.ok(response);
     }
 
     // 승인관리 리스트

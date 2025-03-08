@@ -2,6 +2,7 @@ package com.example.finalEclips.eclips.mypage.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.core.io.Resource;
@@ -14,7 +15,6 @@ import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
-import com.example.finalEclips.eclips.mypage.dto.StoreActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreEditDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreInfoDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreRegisterDto;
@@ -47,8 +47,11 @@ public interface MypageService {
     // 사업자 : 예약 활성화 업데이트
     void saveStoreInfo(ReservationActivateDto reservationActivateDto);
 
-    // 사업자 : 예약 조회
-    List<StoreActivateDto> getStoreActivateByPeriod(@Param("userId") String userId, @Param("period") String period);
+    // 사업자 : 기간별 예약 조회 (페이지네이션 포함)
+    Map<String, Object> getStoreActivateByPeriod(String userId, String period, Pageable pageable);
+
+    // 사업자 : 기간별 예약 수 조회
+    int getStoreActivateCountByPeriod(String userId, String period);
 
     // 승인관리 리스트
     List<ApprovalListDto> getApprovalManagementList(@Param("status") String status);

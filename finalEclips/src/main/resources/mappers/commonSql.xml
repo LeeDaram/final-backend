@@ -155,7 +155,7 @@
     <sql id="paginationWhere">
         <![CDATA[WHERE row_num >= #{pageable.offset} + 1 AND row_num <= #{pageable.offset} + #{pageable.pageSize}]]>
     </sql>
-    
+
     
     <!-- 리뷰 목록 조회 (페이지네이션 포함) -->
     <sql id="reviewBaseQuery">
