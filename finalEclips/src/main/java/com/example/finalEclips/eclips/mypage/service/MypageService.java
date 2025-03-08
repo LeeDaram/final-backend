@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
-import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
@@ -53,8 +52,11 @@ public interface MypageService {
     // 사업자 : 기간별 예약 수 조회
     int getStoreActivateCountByPeriod(String userId, String period);
 
-    // 승인관리 리스트
-    List<ApprovalListDto> getApprovalManagementList(@Param("status") String status);
+    // 승인관리 리스트 (페이지네이션 포함)
+    Map<String, Object> getApprovalManagementList(@Param("status") String status, Pageable pageable);
+
+    // 승인관리 리스트 수 조회
+    int getTotalActivateCount(String status);
 
     // 승인관리 상세모달
     List<StoreInfoDto> getModalStoreInfo(@Param("storeId") int storeId);

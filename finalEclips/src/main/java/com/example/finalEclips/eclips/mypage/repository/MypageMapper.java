@@ -55,8 +55,12 @@ public interface MypageMapper {
     // 사업자 : 기간별 예약 수 조회
     int countStoreActivateByPeriod(@Param("userId") String userId, @Param("period") String period);
 
-    // 승인관리 리스트
-    List<ApprovalListDto> findApprovalManagementList(@Param("status") String status);
+    // 승인관리 리스트 (페이지네이션 포함)
+    List<ApprovalListDto> findApprovalManagementList(@Param("status") String status,
+            @Param("pageable") Pageable pageable);
+
+    // 승인관리 리스트 수 조회
+    int findTotalActivateCount(@Param("status") String status);
 
     // 승인관리 상세모달
     List<StoreInfoDto> findModalStoreInfo(@Param("storeId") int storeId);

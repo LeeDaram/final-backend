@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
-import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
@@ -110,8 +109,11 @@ public class MypageController {
 
     // 승인관리 리스트
     @GetMapping("/approva/management/list")
-    public List<ApprovalListDto> getApprovalManagementList(@RequestParam("status") String status) {
-        return mypageService.getApprovalManagementList(status);
+    public ResponseEntity<?> getApprovalManagementList(@RequestParam("status") String status,
+            @RequestParam("page") int page, @RequestParam("size") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Map<String, Object> response = mypageService.getApprovalManagementList(status, pageable);
+        return ResponseEntity.ok(response);
     }
 
     // 승인관리 상세모달

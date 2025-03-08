@@ -225,41 +225,64 @@
 	    ]]>
 	</select>
 
-
     <!-- 승인관리 리스트 -->
     <select id="findApprovalManagementList" resultType="com.example.finalEclips.eclips.mypage.dto.ApprovalListDto">
-		SELECT 
-		    am.STORE_ID,
-		    bu.STORE_NAME,
-		    am.MAIN_MENU,
-		    s.SIDO_NAME,
-		    am.PRICE,
-		    am.FINAL_APPROVAL_STATUS,
-		    am.UPDATED_AT
-		FROM 
-		    APPROVAL_MANAGEMENT am
-		JOIN 
-		    GOOD_PRICE_BUSINESS gpb ON am.STORE_ID = gpb.STORE_ID
-		JOIN 
-		    USER_TABLE ut ON gpb.USER_ID = ut.USER_ID
-		JOIN 
-		    BUSINESS_USER bu ON bu.USER_ID = gpb.USER_ID
-		JOIN 
-		    SIGUNGU sg ON bu.SIGUNGU_ID = sg.SIGUNGU_ID
-		JOIN 
-		    SIDO s ON sg.SIDO_ID = s.SIDO_ID
-		WHERE
-		   <choose>
-	            <when test="status == 'ALL'">
-	                1 = 1
-	            </when>
-	            <otherwise>
-	                am.FINAL_APPROVAL_STATUS = #{status}
-	            </otherwise>
-	        </choose>
-		ORDER BY
-		    am.UPDATED_AT DESC
+	    SELECT * FROM (
+	        SELECT
+	            am.STORE_ID,
+	            bu.STORE_NAME,
+	            am.MAIN_MENU,
+	            s.SIDO_NAME,
+	            am.PRICE,
+	            am.FINAL_APPROVAL_STATUS,
+	            am.UPDATED_AT,
+	            ROW_NUMBER() OVER (ORDER BY am.UPDATED_AT DESC) AS row_num
+	        FROM APPROVAL_MANAGEMENT am
+	        JOIN GOOD_PRICE_BUSINESS gpb ON am.STORE_ID = gpb.STORE_ID
+	        JOIN USER_TABLE ut ON gpb.USER_ID = ut.USER_ID
+	        JOIN BUSINESS_USER bu ON bu.USER_ID = gpb.USER_ID
+	        JOIN SIGUNGU sg ON bu.SIGUNGU_ID = sg.SIGUNGU_ID
+	        JOIN SIDO s ON sg.SIDO_ID = s.SIDO_ID
+	        WHERE
+	            <choose>
+	                <when test="status == 'ALL'">
+	                    1 = 1
+	                </when>
+	                <otherwise>
+	                    am.FINAL_APPROVAL_STATUS = #{status}
+	                </otherwise>
+	            </choose>
+	   <![CDATA[
+        ) paginated_results
+        WHERE row_num BETWEEN #{pageable.offset} + 1 AND #{pageable.offset} + #{pageable.pageSize}
+        ]]>
     </select>
+
+    <!-- 승인관리 카운트 -->
+    <select id="findTotalActivateCount" resultType="int">
+	    SELECT COUNT(*)
+	    FROM 
+            APPROVAL_MANAGEMENT am
+        JOIN 
+            GOOD_PRICE_BUSINESS gpb ON am.STORE_ID = gpb.STORE_ID
+        JOIN 
+            USER_TABLE ut ON gpb.USER_ID = ut.USER_ID
+        JOIN 
+            BUSINESS_USER bu ON bu.USER_ID = gpb.USER_ID
+        JOIN 
+            SIGUNGU sg ON bu.SIGUNGU_ID = sg.SIGUNGU_ID
+        JOIN 
+            SIDO s ON sg.SIDO_ID = s.SIDO_ID
+        WHERE
+           <choose>
+                <when test="status == 'ALL'">
+                    1 = 1
+                </when>
+                <otherwise>
+                    am.FINAL_APPROVAL_STATUS = #{status}
+                </otherwise>
+            </choose>
+	</select>
     
     
     <!-- 승인관리 상세모달 -->

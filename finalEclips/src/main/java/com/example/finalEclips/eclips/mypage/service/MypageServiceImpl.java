@@ -123,10 +123,33 @@ public class MypageServiceImpl implements MypageService {
         return mypageMapper.countStoreActivateByPeriod(userId, period);
     }
 
-    // 승인관리 리스트
+    // 승인관리 리스트 조회
     @Override
-    public List<ApprovalListDto> getApprovalManagementList(String status) {
-        return mypageMapper.findApprovalManagementList(status);
+    public Map<String, Object> getApprovalManagementList(String status, Pageable pageable) {
+        // 전체 개수 조회
+        int totalElements = mypageMapper.findTotalActivateCount(status);
+
+        // 페이징된 데이터 조회
+        List<ApprovalListDto> storeApproval = mypageMapper.findApprovalManagementList(status, pageable);
+
+        // 응답 객체 구성
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", storeApproval);
+
+        Map<String, Object> pageInfo = new HashMap<>();
+        pageInfo.put("size", pageable.getPageSize());
+        pageInfo.put("number", pageable.getPageNumber()); // 현재 페이지 번호
+        pageInfo.put("totalElements", totalElements); // 전체 개수
+        pageInfo.put("totalPages", (int) Math.ceil((double) totalElements / pageable.getPageSize())); // 총 페이지 수
+
+        response.put("page", pageInfo);
+        return response;
+    }
+
+    // 승인관리 리스트 수 조회
+    @Override
+    public int getTotalActivateCount(String status) {
+        return mypageMapper.findTotalActivateCount(status);
     }
 
     // 승인관리 상세모달
