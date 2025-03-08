@@ -8,13 +8,16 @@ public class StoreFilterDto {
 	private String sidoName;
 	private int sigunguId;
 	private int storeId;
+	private int reviewId;
+	private String userId;
 	private String sigunguName;
 	private int industryId;
 	private String industryName;
 	private String storeImage;
 	private String storeName;
 	private String mainMenu;
-	private float averageRating;
+	private float reviewAvg;
+	private int reviewCount;
 	private int likeCount;
 	private int price;
 	private String contact;
@@ -27,4 +30,9 @@ public class StoreFilterDto {
 	private String address;
 	private float lat;
 	private float lng;
+    private int rating5Count;
+    private int rating4Count;
+    private int rating3Count;
+    private int rating2Count;
+    private int rating1Count;
 }

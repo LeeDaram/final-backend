@@ -5,46 +5,14 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.finalEclips.eclips.store.repository.StoreMapper">
-
-    <select id="findAllStore" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
-        select store_id, 
-                user_id,
-                industry_id, 
-                contact, 
-                store_image,
-                average_rating,
-                takeout,
-                delivery,
-                wifi,
-                pet,
-                kid,
-                parking,
-                created_at,
-                updated_at
-         from GOOD_PRICE_BUSINESS
-    </select>
-        
-    <select id="findPaginatedStores" resultType="com.example.finalEclips.eclips.store.dto.StoreDto">
-        SELECT t.*
-        FROM (
-            <include refid="CommonSql.storePaginationSql" />
-        ) t
-        <include refid="CommonSql.paginationWhere" />       
-    </select>
-    
-    <select id="findPaginatedStoresCount" resultType="int">
-            SELECT count(*)
-            FROM (
-                <include refid="CommonSql.storePaginationSql" />
-            ) t
-    </select>
-    
+    <!-- 시도 -->
     <select id="findSidoName" resultType="com.example.finalEclips.eclips.store.dto.SidoDto">
     	SELECT SIDO_ID,
 			   SIDO_NAME 
 		FROM SIDO
     </select>
     
+    <!-- 시군구 -->
     <select id="findSigunguName" resultType="com.example.finalEclips.eclips.store.dto.SigunguDto">
     	SELECT SIGUNGU_ID,
     		   SIDO_ID,
@@ -52,23 +20,23 @@
 		FROM SIGUNGU
     </select>
     
+    <!-- 업종명 -->
     <select id="findIndustryName" resultType="com.example.finalEclips.eclips.store.dto.IndustryDto">
     	SELECT INDUSTRY_ID,
 			   INDUSTRY_NAME 
 		FROM INDUSTRY
     </select>
     
+    <!-- 업소 목록 페이지네이션 -->
     <select id="filterStore" resultType="com.example.finalEclips.eclips.store.dto.StoreFilterDto">
 		select t.*
 		from(
 			<include refid="CommonSql.filterPaginationSql" />
 		) t
-		
-		
 		<include refid="CommonSql.paginationWhere" />
-		
     </select>
     
+    <!-- 업소 총 페이지 개수 -->
     <select id="filterStoreCount" resultType="int">
     	    SELECT count(*)
             FROM (
@@ -76,14 +44,131 @@
             ) t
     </select>
     
+    <!-- 주소 -->
     <select id="findAllAddress" resultType="com.example.finalEclips.eclips.store.dto.StoreAddressDto">
     	select *
     	from BUSINESS_USER
     </select>
 
 	<!-- 업소상세페이지 -->    
-<!--     <select id="findAllStoreDetail" resultType="com.example.finalEclips.eclips.store.dto.StoreDetailDto">
-    	
-    </select> -->
+    <select id="findAllStoreDetail" resultType="com.example.finalEclips.eclips.store.dto.StoreDetailDto">
+       SELECT  GPB.INDUSTRY_ID, 
+			   GPB.AVERAGE_RATING ,
+			   r.REVIEW_ID ,
+			   r.STORE_ID ,
+			   r.USER_ID ,
+			   r.RATING ,
+			   r.CONTENT ,
+			   r.REVIEW_PRICE ,
+			   r.LIKE_COUNT ,
+			   r.CREATED_AT ,
+			   r.REVIEW_PRICE ,
+			   r.REVIEW_MENU ,
+			   ri.REVIEW_IMG 
+		FROM GOOD_PRICE_BUSINESS gpb 
+		INNER JOIN REVIEW r 
+		ON GPB.STORE_ID = r.STORE_ID 
+		INNER JOIN REVIEW_IMG ri  
+		ON r.REVIEW_ID = ri.REVIEW_ID
+    </select> 
+    
+    <!-- 업소상세페이지 예약 -->
+    <insert id="saveActivate">
+    	insert into ACTIVATE(USER_ID, STORE_ID, ACTIVATE_DATE) 
+    	values (#{userId}, #{storeId}, #{reservationDate})
+    </insert>
+    
+    <!-- 유저 조회 -->
+    <select id="findUserById" resultType="com.example.finalEclips.eclips.store.dto.UserDto">
+    	select user_id, password, name, birth_date, phone_number, email, role, login_type
+    	from user_table
+    	where user_id = #{userId}
+    </select>
+    
+    <!-- 예약중복 체크 -->
+    <select id="existsByUserIdAndDate" resultType="boolean">
+    	    SELECT CASE 
+           WHEN COUNT(*) > 0 THEN 1
+           ELSE 0
+           END 
+    FROM ACTIVATE 
+    WHERE USER_ID = #{userId} 
+    AND ACTIVATE_DATE = #{reservationDate}
+    </select>
+    
+    <!-- 이용후기 파일업로드 -->
+	 <insert id="saveReviewAttechments">
+        INSERT INTO REVIEW_IMG(review_id, origin_filename, stored_filename, content_type, file_size)
+        <foreach collection="fileDtos" item="item" separator="UNION ALL">
+            SELECT #{reviewId}, #{item.originFilename}, #{item.storedFilename}, #{item.contentType}, #{item.size} FROM DUAL
+        </foreach>
+    </insert>
+    
+    <!-- 리뷰 저장(리뷰테이블 먼저 저장 후 리뷰img 테이블에서 id를 조회해서 맞춰서 저장) -->
+    <insert id="saveReview" keyColumn="review_id" keyProperty="reviewId" useGeneratedKeys="true">
+    	insert into review (store_id, user_id, rating, content, review_menu, review_price)
+    	values(#{storeId},#{userId},#{rating},#{review},#{menu},#{cost})
+    </insert>
+    
+    <!-- 리뷰전체조회 -->
+    <select id="findAttachmentByReviewId" resultType="com.example.finalEclips.eclips.store.dto.ReviewAttachmentDto">
+    	select 
+    		review_id,
+    		review_img_id
+    		origin_filename,
+    		stored_filename,
+    		content_type,
+    		file_size,
+    		created_at
+    	from review_img
+    	where review_id = #{reviewId}
+    </select>
+    
+    
+    <!-- 리뷰 첨부파일 조회-->
+    <select id="findReviewAttachmentById" resultType="com.example.finalEclips.eclips.store.dto.ReviewAttachmentDto">
+    	select
+    		review_img_id, 
+    		review_id,
+    		origin_filename,
+    		stored_filename,
+    		content_type,
+    		file_size,
+    		created_at
+		from review_img
+		where review_img_id = #{id}
+    </select>
 
+	<!-- 리뷰 조회 -->
+	<select id="findStoreReviews" resultType="com.example.finalEclips.eclips.store.dto.StoreReviewDto">
+		select t.*,
+		       (
+		       	SELECT LISTAGG(review_img_id, ',') WITHIN GROUP (ORDER BY review_img_id) 
+				FROM review_img
+				WHERE review_id = t.review_id
+		       ) AS image_ids
+		from(
+			<include refid="CommonSql.storeReviewPaginationSql" />
+		) t
+		<include refid="CommonSql.paginationWhere" />
+	</select>
+	
+	<select id="findStoreReviewTotalCount" resultType="int">
+		SELECT count(*)
+        FROM (
+        	<include refid="CommonSql.storeReviewPaginationSql" />
+        ) t
+	</select>
+	
+	<!-- 공감 증가 또는 감소 -->
+	<update id="incrementLikeCount">
+	    UPDATE review
+	    SET like_count = like_count + 
+	        CASE 
+	            WHEN #{isLiked} = 1 THEN 1  
+	            ELSE -1                       
+	        END
+	    WHERE review_id = #{reviewId}
+	</update>
+    
 </mapper>

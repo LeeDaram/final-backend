@@ -3,7 +3,6 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.finalEclips.eclips.averageprice.repository.AveragePriceMapper">
-
     <!-- 평균가격 조회 -->
     <select id="getAveragePrice" parameterType="com.example.finalEclips.eclips.averageprice.dto.AveragePriceDto" resultType="int">
         SELECT 
