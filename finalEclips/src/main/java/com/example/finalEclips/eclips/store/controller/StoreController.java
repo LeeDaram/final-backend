@@ -10,6 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,7 @@ import com.example.finalEclips.eclips.store.dto.FilterRequestDto;
 import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.ReviewAttachmentDto;
 import com.example.finalEclips.eclips.store.dto.ReviewDto;
+import com.example.finalEclips.eclips.store.dto.ReviewRequestDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
 import com.example.finalEclips.eclips.store.dto.StoreAddressDto;
@@ -129,5 +131,13 @@ public class StoreController {
  		return ResponseEntity.status(HttpStatus.CREATED).build();
  	}
  
+ 	
+ 	// 공감수 증감
+ 	@PatchMapping("/{reviewId}/like")
+ 	public ResponseEntity<ReviewRequestDto> updateReviewById(@PathVariable("reviewId") int reviewId, 
+ 			@RequestBody ReviewRequestDto requestDto){
+ 		storeService.toggleLike(reviewId, requestDto);
+ 		return ResponseEntity.ok().build();
+ 	}
  	
 }

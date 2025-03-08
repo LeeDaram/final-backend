@@ -11,6 +11,7 @@ import com.example.finalEclips.eclips.common.dto.PaginationDto;
 import com.example.finalEclips.eclips.store.dto.IndustryDto;
 import com.example.finalEclips.eclips.store.dto.ReviewAttachmentDto;
 import com.example.finalEclips.eclips.store.dto.ReviewDto;
+import com.example.finalEclips.eclips.store.dto.ReviewRequestDto;
 import com.example.finalEclips.eclips.store.dto.SidoDto;
 import com.example.finalEclips.eclips.store.dto.SigunguDto;
 import com.example.finalEclips.eclips.store.dto.StoreAddressDto;
@@ -42,5 +43,5 @@ public interface StoreMapper {
     ReviewAttachmentDto findReviewAttachmentById(int id); //리뷰 아이디 조회
     List<StoreReviewDto> findStoreReviews(PaginationDto<?> paginationDto);
     int findStoreReviewTotalCount(PaginationDto<?> paginationDto);
-    void incrementLikeCount(int id); // 공감수
+    void incrementLikeCount(ReviewRequestDto reviewRequestDto); // 공감수 증감
 }

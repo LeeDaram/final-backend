@@ -24,6 +24,7 @@ import com.example.finalEclips.eclips.store.dto.StoreFilterDto;
 import com.example.finalEclips.eclips.store.dto.StoreRequestDetailDto;
 import com.example.finalEclips.eclips.store.dto.StoreRequestDto;
 import com.example.finalEclips.eclips.store.dto.ReviewDto;
+import com.example.finalEclips.eclips.store.dto.ReviewRequestDto;
 
 public interface StoreService {
     PageImpl<StoreDto> getStores(StoreRequestDto storeRequestDto, Pageable pageable); // 착한가격업소 모든 정보 조회
@@ -40,4 +41,5 @@ public interface StoreService {
     ResponseEntity<Resource> showReviewAttachmentResource(int id) throws IOException; // 파일 하나씩 조회
     List<ReviewAttachmentDto> getReviewAttachmentsByReviewId(int reviewId); // 리뷰 아이디로 다 조회
     PageImpl<StoreReviewDto> getStoreReviews(StoreReviewRequestDto requestDto, Pageable pageable);
+    void toggleLike(int reviewId, ReviewRequestDto requestDto); //공감수 증감
 }

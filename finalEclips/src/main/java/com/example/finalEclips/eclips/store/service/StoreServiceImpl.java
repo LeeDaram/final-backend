@@ -32,6 +32,7 @@ import com.example.finalEclips.eclips.store.dto.StoreFilterDto;
 import com.example.finalEclips.eclips.store.dto.StoreRequestDetailDto;
 import com.example.finalEclips.eclips.store.dto.StoreRequestDto;
 import com.example.finalEclips.eclips.store.dto.ReviewDto;
+import com.example.finalEclips.eclips.store.dto.ReviewRequestDto;
 import com.example.finalEclips.eclips.store.repository.StoreMapper;
 
 import jakarta.transaction.Transactional;
@@ -163,8 +164,14 @@ public class StoreServiceImpl implements StoreService {
 		List<StoreReviewDto> content = storeMapper.findStoreReviews(paginationDto);
 		
 		int totalCount = storeMapper.findStoreReviewTotalCount(paginationDto);
-		
+
 		return new PageImpl<>(content, pageable, totalCount);
 	}
+
+	@Override
+	public void toggleLike(int reviewId, ReviewRequestDto requestDto) {
+		storeMapper.incrementLikeCount(requestDto);
+	}
+
 
 }

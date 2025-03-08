@@ -16,4 +16,5 @@ public class StoreReviewDto {
 	private int likeCount;
 	private LocalTime createdAt;
 	private String imageIds;
+	private int sort;
 }

@@ -9,10 +9,15 @@
     </sql>
     
     <sql id="storeReviewPaginationSql">
-    	select t.*
+    	select t.*,
+    					<if test="data.sort == 0">
+					ROW_NUMBER() OVER (ORDER BY like_count DESC, like_count) AS row_num
+				</if>
+				<if test="data.sort == 1">
+					ROW_NUMBER() OVER (ORDER BY created_at DESC, created_at) AS row_num
+				</if>
 		from(
 			SELECT
-				ROW_NUMBER() OVER (ORDER BY like_count DESC, store_id) AS row_num, 
 				review_id,
 				store_id,
 				user_id ,
