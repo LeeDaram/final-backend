@@ -9,6 +9,7 @@ import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
 import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
 import com.example.finalEclips.eclips.mypage.dto.PaginationDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
+import com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreEditDto;
@@ -57,5 +58,8 @@ public interface MypageMapper {
 
     // 승인 반려 상태값 변경
     void updateApprovalStatusToPending(StoreInfoDto storeInfoDto);
+
+    // 이미지 조회
+    ReviewAttachmentDto findReviewAttachmentById(int id);
 
 }

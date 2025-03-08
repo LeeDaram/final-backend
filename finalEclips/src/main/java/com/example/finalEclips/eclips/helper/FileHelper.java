@@ -1,15 +1,5 @@
 package com.example.finalEclips.eclips.helper;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.example.finalEclips.eclips.common.dto.FileDto;
-import com.example.finalEclips.eclips.config.FileConfiguration;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -19,13 +9,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.example.finalEclips.eclips.common.dto.FileDto;
+import com.example.finalEclips.eclips.config.FileConfiguration;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class FileHelper {
-	private final FileConfiguration fileConfiguration;
-	
-	public List<FileDto> uploadFiles(final List<MultipartFile> files) {
+    private final FileConfiguration fileConfiguration;
+
+    public List<FileDto> uploadFiles(final List<MultipartFile> files) {
         List<FileDto> fileDtos = new ArrayList<>();
         for (MultipartFile file : files) {
             if (file.isEmpty()) {
@@ -51,12 +51,8 @@ public class FileHelper {
             throw new RuntimeException(e);
         }
 
-        return FileDto.builder()
-                .originFilename(originFilename)
-                .storedFilename(storedFilename)
-                .contentType(file.getContentType())
-                .size(file.getSize())
-                .build(); 
+        return FileDto.builder().originFilename(originFilename).storedFilename(storedFilename)
+                .contentType(file.getContentType()).size(file.getSize()).build();
     }
 
     private String makeStoredFilename(String originFilename) {
@@ -74,7 +70,9 @@ public class FileHelper {
     }
 
     public Resource getFileResource(String filename) throws MalformedURLException {
-        Path filePath = Paths.get(String.format("%s/%s", fileConfiguration.getDirPath(), filename)).toAbsolutePath().normalize();
+        Path filePath = Paths.get(String.format("%s/%s", fileConfiguration.getDirPath(), filename)).toAbsolutePath()
+                .normalize();
         return new UrlResource(filePath.toUri());
     }
+
 }

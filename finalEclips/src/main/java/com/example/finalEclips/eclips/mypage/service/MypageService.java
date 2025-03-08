@@ -1,14 +1,18 @@
 package com.example.finalEclips.eclips.mypage.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
 import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
+import com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreEditDto;
@@ -54,5 +58,11 @@ public interface MypageService {
 
     // 승인 반려 상태값 변경
     void updateApprovalStatus(StoreInfoDto storeInfoDto);
+
+    // 파일 조회
+    ReviewAttachmentDto getReviewAttachment(int id);
+
+    // 파일 불러오기
+    ResponseEntity<Resource> downloadPostAttachmentResource(int id) throws IOException;
 
 }

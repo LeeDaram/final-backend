@@ -4,16 +4,13 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.finalEclips.eclips.mypage.repository.MypageMapper">
-    
-    <!-- 리뷰 -->
-	
-	
 	<!-- 예약 : 사용자 관점-->
 	<resultMap id="activateResultMap" type="com.example.finalEclips.eclips.mypage.dto.UserActivateDto">
 	    <result property="storeId" column="STORE_ID" />
 	    <result property="storeName" column="STORE_NAME" />
 	    <result property="activateDate" column="ACTIVATE_DATE" />
 	</resultMap>
+	
 	
 	<!-- 예약 : 업소관점 -->
     <resultMap id="storeActivateResultMap" type="com.example.finalEclips.eclips.mypage.dto.StoreActivateDto">
@@ -23,6 +20,7 @@
         <result property="phoneNumber" column="PHONE_NUMBER"/>
         <result property="storeName" column="STORE_NAME"/>
     </resultMap>
+	
 	
 	<!-- 사용자 아이디 + 기간별로 리뷰 조회 (페이지네이션 적용) -->
     <select id="findReviewByPeriod" resultType="com.example.finalEclips.eclips.mypage.dto.ReviewDto">
@@ -37,6 +35,7 @@
 	    ) t
 	    <include refid="CommonSql.paginationWhere"/>
 	</select>
+    
     
 	<!-- 전체 리뷰 개수 조회 -->
     <select id="countReviewByPeriod" resultType="int">
@@ -63,6 +62,7 @@
             </if>
         </if>
     </select>
+	
 	
 	<!-- 리뷰 삭제 -->
 	<delete id="deleteReview">
@@ -111,6 +111,7 @@
         WHERE UT.USER_ID = #{userId}
     </select>
     
+    
     <!-- 사업자 : 재신청 조회 -->
     <select id="findStoreRegisterInfo" resultType="com.example.finalEclips.eclips.mypage.dto.StoreRegisterDto">
         SELECT 
@@ -139,6 +140,7 @@
 		    ut.USER_ID = #{userId}
     </select>
     
+    
     <!-- 사업자 : 업소정보 조회 -->
     <select id="findStoreInfo" resultType="com.example.finalEclips.eclips.mypage.dto.StoreEditDto">
         SELECT 
@@ -162,6 +164,7 @@
 		    ut.USER_ID = #{userId}
     </select>
 
+
     <!-- 사업자 : 예약 활성화 업데이트  -->
     <update id="updateStoreInfo" parameterType="com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto">
 	    UPDATE ACTIVATE_RESERVATION ar
@@ -174,6 +177,7 @@
 	        WHERE gpb.USER_ID = #{userId}
 	    )
 	</update>
+	
 	
 	<!-- 사업자 : 예약 조회 -->
     <select id="findStoreActivateByPeriod" resultMap="storeActivateResultMap">
@@ -198,6 +202,7 @@
             ORDER BY A.ACTIVATE_DATE DESC
         </if>
     </select>
+    
     
     <!-- 승인관리 리스트 -->
     <select id="findApprovalManagementList" resultType="com.example.finalEclips.eclips.mypage.dto.ApprovalListDto">
@@ -234,6 +239,7 @@
 		    am.UPDATED_AT DESC
     </select>
     
+    
     <!-- 승인관리 상세모달 -->
     <select id="findModalStoreInfo" resultType="com.example.finalEclips.eclips.mypage.dto.StoreInfoDto">
         SELECT 
@@ -265,11 +271,27 @@
 		    AM.STORE_ID = #{storeId}
     </select>
     
+    
     <!-- 승인 반려 상태값 변경 -->
     <update id="updateApprovalStatusToPending" parameterType="com.example.finalEclips.eclips.mypage.dto.StoreInfoDto">
         UPDATE APPROVAL_MANAGEMENT
 		SET FINAL_APPROVAL_STATUS = #{finalApprovalStatus}
 		WHERE STORE_ID = #{storeId}
     </update>
+
+
+    <!-- 리뷰 첨부파일 조회-->
+    <select id="findReviewAttachmentById" resultType="com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto">
+        SELECT
+           REVIEW_IMG_ID, 
+           REVIEW_ID,
+           ORIGIN_FILENAME,
+           STORED_FILENAME,
+           CONTENT_TYPE,
+           FILE_SIZE,
+           CREATED_AT
+       FROM REVIEW_IMG
+       WHERE REVIEW_IMG_ID = #{id}
+    </select>
 
 </mapper>

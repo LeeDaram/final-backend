@@ -1,7 +1,9 @@
 package com.example.finalEclips.eclips.mypage.controller;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
 import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
+import com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreEditDto;
@@ -126,4 +129,17 @@ public class MypageController {
             return "업데이트에 실패했습니다: " + e.getMessage();
         }
     }
+
+    // 파일 조회
+    @GetMapping("/attachments/{id}")
+    public ResponseEntity<ReviewAttachmentDto> getReviewAttachment(@PathVariable("id") int id) {
+        return ResponseEntity.ok(mypageService.getReviewAttachment(id));
+    }
+
+    // 파일 불러오기
+    @GetMapping("/posts/attachments/{id}")
+    public ResponseEntity<Resource> getPostAttachment(@PathVariable("id") int id) throws IOException {
+        return mypageService.downloadPostAttachmentResource(id);
+    }
+
 }
