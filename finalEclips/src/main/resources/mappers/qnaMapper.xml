@@ -111,4 +111,50 @@
 	ORDER BY CREATED_AT DESC
 	</select>
 	
+	<!-- 페이지네이션 -->
+    <select id="findPaginatedQnas" resultType="com.example.finalEclips.eclips.qna.dto.QnaPaginationDto">
+		SELECT t2.*
+			FROM (
+			  SELECT 
+			    t1.*,
+			    (SELECT COUNT(*) FROM answer WHERE QUESTION_ID = t1.QUESTION_ID) AS answer_count
+			  FROM (
+			    SELECT
+			      ROW_NUMBER() OVER (ORDER BY q.QUESTION_ID DESC, q.CREATED_AT DESC) AS row_num,
+			      q.QUESTION_ID,
+			      q.USER_ID,
+			      q.TITLE,
+			      q.CONTENT,
+			      q.CREATED_AT,
+			      q.VIEWS
+			    FROM QUESTION q
+			  ) t1
+			  <include refid="CommonSql.paginationWhere" />
+			) t2
+	</select>
+	
+	<select id="findPaginatedQnasCount" resultType="int">
+		SELECT COUNT(*)
+		  FROM (
+		    SELECT t1.*
+		    FROM (
+		      SELECT
+		        ROW_NUMBER() OVER (ORDER BY q.QUESTION_ID DESC, q.CREATED_AT DESC) AS row_num,
+		        q.QUESTION_ID,
+		        q.USER_ID,
+		        q.TITLE,
+		        q.CONTENT AS QNA_CONTENT,
+		        q.CREATED_AT AS QNA_CREATED_AT,
+		        q.VIEWS,
+		        a.ANSWER_ID AS answer_id,
+		        a.QUESTION_ID AS question_answer,
+		        a.CONTENT AS ANSWER_CONTENT,
+		        a.CREATED_AT AS ANSWER_CREATED_AT,
+		        a.UPDATED_AT
+		      FROM QUESTION q
+		      LEFT OUTER JOIN ANSWER a ON q.QUESTION_ID = a.QUESTION_ID
+		    ) t1
+		  ) t2	
+    </select>
+	
 </mapper>

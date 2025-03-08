@@ -47,6 +47,19 @@
 		LEFT OUTER JOIN NOTICE_ATTACHMENTS na ON n.notice_id = na.notice_id
 		ORDER BY n.IS_MAIN_NOTICE DESC, n.CREATED_AT DESC
 	</select>
+	<select id="findNoticeAttachmentsByNoticeId" resultType="com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto">
+    SELECT
+          ATTACHMENT_ID,
+          NOTICE_ID,
+          ORIGIN_FILENAME,
+          STORED_FILENAME,
+          CONTENT_TYPE,
+          FILE_SIZE,
+          CREATED_AT
+    FROM NOTICE_ATTACHMENTS
+    WHERE NOTICE_ID = #{noticeId}
+	</select>
+	
 	
 	<select id="findNoticeAttachmentById" resultType="com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto">
 		SELECT
@@ -89,7 +102,7 @@
 	ORDER BY IS_MAIN_NOTICE DESC, CREATED_AT DESC
 	</select>
 	
-	<select id="findNoticeById" resultType="com.example.finalEclips.eclips.notice.dto.NoticeUpdateDto" resultMap="noticeResultMap">
+	<select id="findNoticeById" resultMap="noticeResultMap">
 	SELECT
 	      NOTICE_ID, 
 	      TITLE, 
@@ -114,9 +127,17 @@
 	DELETE NOTICE WHERE notice_id = #{id}
 	</delete>
 	
-	<insert id="saveNotice">
+	<!-- <insert id="saveNotice">
 	INSERT INTO NOTICE (TITLE, CONTENT, IS_MAIN_NOTICE)
 	VALUES( #{title}, #{content}, #{isMainNotice})
+	</insert> -->
+	
+	<insert id="saveNotice" parameterType="com.example.finalEclips.eclips.notice.dto.CreateNoticeDto">
+    <selectKey keyProperty="noticeId" resultType="int" order="BEFORE">
+        SELECT notice_id_seq.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO NOTICE (NOTICE_ID, TITLE, CONTENT, IS_MAIN_NOTICE)
+    VALUES (#{noticeId}, #{title}, #{content}, #{isMainNotice})
 	</insert>
 	
 	
@@ -125,4 +146,47 @@
         SET VIEWS = VIEWS + 1
         WHERE NOTICE_ID = #{id}
     </update>
+    
+    <!-- 페이지네이션 -->
+    <select id="findPaginatedNotices" resultType="com.example.finalEclips.eclips.notice.dto.NoticePaginationDto">
+		SELECT t2.*,
+		       (SELECT COUNT(*) FROM notice_attachments WHERE notice_id = t2.notice_id) AS attachments_count
+		FROM (
+			SELECT t1.*
+			FROM (
+				SELECT
+				      ROW_NUMBER() OVER (ORDER BY is_main_notice DESC, created_at DESC) AS row_num,
+				      notice_id,
+				      title,
+				      content,
+				      is_main_notice,
+				      created_at,
+				      updated_at,
+				      views AS views
+				FROM NOTICE n
+			) t1
+			<include refid="CommonSql.paginationWhere" />
+		) t2	
+	</select>
+	
+	<select id="findPaginatedNoticesCount" resultType="int">
+		SELECT COUNT(*)
+		FROM (
+			SELECT t1.*
+			FROM (
+				SELECT
+				      ROW_NUMBER() OVER (ORDER BY is_main_notice DESC, created_at DESC) AS row_num,
+				      notice_id,
+				      title,
+				      content,
+				      is_main_notice,
+				      created_at,
+				      updated_at,
+				      views AS views
+				FROM NOTICE n
+			) t1
+			
+		) t2
+    </select>
+    
 </mapper>

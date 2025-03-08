@@ -1,16 +1,26 @@
 package com.example.finalEclips.eclips.notice.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.finalEclips.eclips.common.dto.FileDto;
+import com.example.finalEclips.eclips.common.dto.PaginationDto;
 import com.example.finalEclips.eclips.helper.FileHelper;
 import com.example.finalEclips.eclips.notice.dto.CreateNoticeDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeDto;
+import com.example.finalEclips.eclips.notice.dto.NoticeRequestDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeUpdateDto;
 import com.example.finalEclips.eclips.notice.repository.NoticeMapper;
 
@@ -54,25 +64,59 @@ public class NoticeServiceImpl implements NoticeService {
 		noticeMapper.deleteNoticeById(id);
 	}
 
-	@Override
-	public void createNotice(CreateNoticeDto createNoticeDto) {
-		noticeMapper.saveNotice(createNoticeDto);
-		
-	}
-
-	//파일 업로드
+	//파일 삭제
 	@Override
 	public void deleteNoticeAttachments(int noticeId) {
 		noticeMapper.deleteNoticeAttachmentsByPostId(noticeId);
 		
 	}
-
+	//파일 업로드
 	@Override
 	public void createNoticeAttachments(int noticeId, List<MultipartFile> files) {
 		List<FileDto> fileDtos = fileHelper.uploadFiles(files);
 		this.deleteNoticeAttachments(noticeId);
 		noticeMapper.saveNoticeAttachments(noticeId, fileDtos);
 		
+	}
+
+	@Override
+	public int createNotice(CreateNoticeDto createNoticeDto) {
+		noticeMapper.saveNotice(createNoticeDto);
+        return createNoticeDto.getNoticeId(); // mapper에서 id반환
+	}
+
+	@Override
+	public ResponseEntity<Resource> downloadNoticeAttachmentResource(int id) throws IOException {
+		NoticeAttachmentDto noticeAttachment = this.getNoticeAttachment(id);
+		Resource resource = fileHelper.getFileResource(noticeAttachment.getStoredFilename());
+
+		 // 파일이 존재하는지 확인
+        if (!resource.exists()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        // 파일 유형을 결정 (MIME 타입 설정)
+        String contentType = Files.probeContentType(resource.getFile().toPath());
+        if (contentType == null) {
+            contentType = "application/octet-stream"; // 기본 바이너리 타입
+        }
+        
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", noticeAttachment.getOriginFilename()))
+                .body(resource);
+	}
+
+	@Override
+	public List<NoticeAttachmentDto> getNoticeAttachmentsByNoticeId(int noticeId) {
+		return noticeMapper.findNoticeAttachmentsByNoticeId(noticeId);
+	}
+
+	@Override
+	public PageImpl<NoticeDto> getNoticesPage(NoticeRequestDto noticeRequestDto, Pageable pageable) {
+		PaginationDto<?> paginationDto = PaginationDto.builder().data(noticeRequestDto).pageable(pageable).build();
+		List<NoticeDto> content = noticeMapper.findPaginatedNotices(paginationDto);
+		int totalCount = noticeMapper.findPaginatedNoticesCount(paginationDto);
+		return new PageImpl<>(content, pageable, totalCount);
 	}	
 
 }

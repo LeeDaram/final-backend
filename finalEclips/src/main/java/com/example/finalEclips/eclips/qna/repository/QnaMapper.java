@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.example.finalEclips.eclips.common.dto.PaginationDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeDto;
 import com.example.finalEclips.eclips.qna.dto.AnswerUpdateDto;
 import com.example.finalEclips.eclips.qna.dto.CreateQnaAnswerDto;
@@ -22,5 +23,8 @@ public interface QnaMapper {
 	void deleteQnaAnswerById(int id); //답변삭제
 	void deleteAnswersByQuestionId(int questionId); //모든답변삭제
 	List<QnaDto> findSearchQna(String search); // 제목 또는 내용검색
-
+	
+	//페이지네이션 
+	List<QnaDto> findPaginatedQnas(PaginationDto<?> paginationDto);
+	int findPaginatedQnasCount(PaginationDto<?> paginationDto);
 }

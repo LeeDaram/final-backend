@@ -1,7 +1,14 @@
 package com.example.finalEclips.eclips.notice.controller;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.finalEclips.eclips.notice.dto.CreateNoticeDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeAttachmentDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeDto;
+import com.example.finalEclips.eclips.notice.dto.NoticeRequestDto;
 import com.example.finalEclips.eclips.notice.dto.NoticeUpdateDto;
 import com.example.finalEclips.eclips.notice.service.NoticeService;
 
@@ -35,6 +43,14 @@ public class NoticeController {
 	public ResponseEntity<List<NoticeDto>> getNotice() {
 		return ResponseEntity.ok(noticeService.getNotices());
 	}
+	// 공지사항 페이지네이션
+	@GetMapping("/main/pagination")
+	public ResponseEntity<PageImpl<NoticeDto>> getNoticesPage(
+			NoticeRequestDto noticeRequestDto,
+			@PageableDefault(size = 8, page = 0) Pageable pageable
+			){
+		return ResponseEntity.ok(noticeService.getNoticesPage(noticeRequestDto, pageable));
+				}
 	//각 게시물 첨부파일 조회
 	@GetMapping("/attachments/{id}")
 	public ResponseEntity<NoticeAttachmentDto> getNoticeAttachment(@PathVariable("id") int id){
@@ -74,9 +90,25 @@ public class NoticeController {
 	}
 	//공지사항 작성
 	@PostMapping("/create")
-	public ResponseEntity<Void> createNotice(@RequestBody CreateNoticeDto createNoticeDto){
-		noticeService.createNotice(createNoticeDto);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<Map<String, Integer>> createNotice(@RequestBody CreateNoticeDto createNoticeDto) {
+	    int noticeId = noticeService.createNotice(createNoticeDto);
+	    Map<String, Integer> response = new HashMap<>();
+	    response.put("id", noticeId); //프론트로 id값 반환해서 공지사항 먼져 작성후 올라간 id값에 첨부파일 업로드
+	    return ResponseEntity.ok(response);
 	}
-	
+	// 첨부파일 조회
+	@GetMapping("/attachment/img/{id}/download")
+	public ResponseEntity<Resource> downloadNoticeAttachment(@PathVariable("id") int id) throws IOException {
+		return noticeService.downloadNoticeAttachmentResource(id);
+    }
+	// 공지사항별 첨부파일 정보 조회
+	@GetMapping("/attachment/{noticeId}/download")
+	public ResponseEntity<List<NoticeAttachmentDto>> getNoticeAttachments(@PathVariable("noticeId") int noticeId) {
+	    List<NoticeAttachmentDto> attachments = noticeService.getNoticeAttachmentsByNoticeId(noticeId);
+	    if (attachments == null || attachments.isEmpty()) {
+//	        return ResponseEntity.notFound().build();
+	    	
+	    }
+	    return ResponseEntity.ok(attachments);
+	}
 }

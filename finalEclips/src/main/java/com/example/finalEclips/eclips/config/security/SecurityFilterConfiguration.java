@@ -41,7 +41,6 @@ public class SecurityFilterConfiguration {
         http.authorizeHttpRequests(auth -> auth
                 // 회원가입, 로그인, 로그아웃, 이메일 인증
                 .requestMatchers("/**").permitAll()
-
                 // 역할
                 .requestMatchers("/api/users/personal/**").hasRole("USER").requestMatchers("/api/users/biz/**")
                 .hasRole("BIZ").requestMatchers("/api/users/admin/**").hasRole("ADMIN")

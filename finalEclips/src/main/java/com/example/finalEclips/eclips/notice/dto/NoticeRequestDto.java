@@ -3,10 +3,8 @@ package com.example.finalEclips.eclips.notice.dto;
 import lombok.Data;
 
 @Data
-public class CreateNoticeDto {
+public class NoticeRequestDto {
 	private int noticeId;
 	private String title;
-	private String content;
-	private String isMainNotice;
-	
+
 }

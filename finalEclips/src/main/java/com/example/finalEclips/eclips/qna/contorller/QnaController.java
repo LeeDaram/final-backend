@@ -3,6 +3,9 @@ package com.example.finalEclips.eclips.qna.contorller;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Delete;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +22,7 @@ import com.example.finalEclips.eclips.qna.dto.AnswerUpdateDto;
 import com.example.finalEclips.eclips.qna.dto.CreateQnaAnswerDto;
 import com.example.finalEclips.eclips.qna.dto.CreateQnaDto;
 import com.example.finalEclips.eclips.qna.dto.QnaDto;
+import com.example.finalEclips.eclips.qna.dto.QnaRequestDto;
 import com.example.finalEclips.eclips.qna.service.QnaService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +38,13 @@ public class QnaController {
 	@GetMapping("/main")
 	public ResponseEntity<List<QnaDto>> getQnas() {
 		return ResponseEntity.ok(qnaService.getQnas());
+	}
+	@GetMapping("/main/pagination")
+	public ResponseEntity<PageImpl<QnaDto>> getQnasPage(
+			QnaRequestDto qnaRequestDto,
+			@PageableDefault(size = 8, page = 0) Pageable pageable
+			){
+		return ResponseEntity.ok(qnaService.getQnasPage(qnaRequestDto, pageable));
 	}
 	
 	//Qna 아이디 조회
