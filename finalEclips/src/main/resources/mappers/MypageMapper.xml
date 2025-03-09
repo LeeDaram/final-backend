@@ -23,19 +23,55 @@
 	
 	
 	<!-- 사용자 아이디 + 기간별로 리뷰 조회 (페이지네이션 적용) -->
-    <select id="findReviewByPeriod" resultType="com.example.finalEclips.eclips.mypage.dto.ReviewDto">
-	     SELECT t.*,
-           (
-               SELECT LISTAGG(review_img_id, ',') WITHIN GROUP (ORDER BY review_img_id) 
-               FROM review_img
-               WHERE review_id = t.review_id
-           ) AS review_img_ids
-        FROM (
-	        <include refid="CommonSql.reviewBaseQuery"/>
-	    ) t
-	    <include refid="CommonSql.paginationWhere"/>
+	<select id="findReviewByPeriod" resultType="com.example.finalEclips.eclips.mypage.dto.ReviewDto">
+	    SELECT R.*,
+	        (
+	            SELECT LISTAGG(review_img_id, ',') WITHIN GROUP (ORDER BY review_img_id) 
+	            FROM review_img
+	            WHERE review_id = R.review_id
+	        ) AS review_img_ids
+	    FROM (
+	        SELECT R.REVIEW_ID, 
+	               R.STORE_ID, 
+	               R.USER_ID, 
+	               R.RATING, 
+	               R.CONTENT, 
+	               R.REVIEW_MENU, 
+	               R.REVIEW_PRICE, 
+	               R.LIKE_COUNT, 
+	               R.CREATED_AT, 
+	               BU.STORE_NAME
+	        FROM REVIEW R
+	        LEFT JOIN GOOD_PRICE_BUSINESS GPB ON R.STORE_ID = GPB.STORE_ID
+	        LEFT JOIN USER_TABLE U ON GPB.USER_ID = U.USER_ID
+	        LEFT JOIN BUSINESS_USER BU ON U.USER_ID = BU.USER_ID
+	        WHERE R.USER_ID = #{userId, jdbcType=VARCHAR}
+	        
+	        <if test="period != 'all'">
+	            <if test="period == 'today'">
+	                AND TRUNC(R.CREATED_AT) = TRUNC(SYSDATE)
+	            </if>
+	            <if test="period == '1month'">
+	                AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -1)
+	            </if>
+	            <if test="period == '3months'">
+	                AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -3)
+	            </if>
+	            <if test="period == '6months'">
+	                AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -6)
+	            </if>
+	            <if test="period == '1year'">
+	                AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -12)
+	            </if>
+	            <if test="period == '3years'">
+	                AND R.CREATED_AT >= ADD_MONTHS(SYSDATE, -36)
+	            </if>
+	        </if>
+	        ORDER BY R.CREATED_AT DESC, R.REVIEW_ID DESC
+	        OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
+	    ) R
 	</select>
-    
+
     
 	<!-- 전체 리뷰 개수 조회 -->
     <select id="countReviewByPeriod" resultType="int">
@@ -76,13 +112,18 @@
 	</delete>
 	
 	
-	<!-- 사용자 아이디 예약 조회 -->
+	<!-- 사용자 아이디 예약 조회 (페이지네이션 적용) -->
 	<select id="findActivateByPeriod" resultMap="activateResultMap">
-	    SELECT A.ACTIVATE_ID, A.ACTIVATE_DATE, A.USER_ID, A.STORE_ID, A.CREATED_AT, BU.STORE_NAME
+	    SELECT A.ACTIVATE_ID, 
+	           A.ACTIVATE_DATE, 
+	           A.USER_ID, 
+	           A.STORE_ID, 
+	           A.CREATED_AT, 
+	           BU.STORE_NAME
 	    FROM ACTIVATE A
-	    LEFT OUTER JOIN GOOD_PRICE_BUSINESS GPB ON A.STORE_ID = GPB.STORE_ID
-	    LEFT OUTER JOIN USER_TABLE U ON GPB.USER_ID = U.USER_ID
-	    LEFT OUTER JOIN BUSINESS_USER BU ON U.USER_ID = BU.USER_ID
+	    LEFT JOIN GOOD_PRICE_BUSINESS GPB ON A.STORE_ID = GPB.STORE_ID
+	    LEFT JOIN USER_TABLE U ON GPB.USER_ID = U.USER_ID
+	    LEFT JOIN BUSINESS_USER BU ON U.USER_ID = BU.USER_ID
 	    WHERE A.USER_ID = #{userId}
 	    <if test="period == 'future'">
 	        <![CDATA[ AND A.ACTIVATE_DATE >= TRUNC(SYSDATE) ]]>
@@ -91,7 +132,24 @@
 	        <![CDATA[ AND A.ACTIVATE_DATE < TRUNC(SYSDATE) ]]>
 	    </if>
 	    ORDER BY A.ACTIVATE_DATE DESC
+	    OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
 	</select>
+	
+	<!-- 사용자 아이디 예약 수 -->
+    <select id="countActivateByPeriod" resultType="int">
+        SELECT COUNT(*) 
+        FROM ACTIVATE A
+        LEFT JOIN GOOD_PRICE_BUSINESS GPB ON A.STORE_ID = GPB.STORE_ID
+        LEFT JOIN USER_TABLE U ON GPB.USER_ID = U.USER_ID
+        LEFT JOIN BUSINESS_USER BU ON U.USER_ID = BU.USER_ID
+        WHERE A.USER_ID = #{userId}
+        <if test="period == 'future'">
+            <![CDATA[ AND A.ACTIVATE_DATE >= TRUNC(SYSDATE) ]]>
+        </if>
+        <if test="period == 'past'">
+            <![CDATA[ AND A.ACTIVATE_DATE < TRUNC(SYSDATE) ]]>
+        </if>
+    </select>
 	
 	
 	<!-- 예약 삭제 -->
@@ -206,7 +264,7 @@
 	            U.NAME,
 	            U.PHONE_NUMBER,
 	            A.STORE_ID,
-	            ROW_NUMBER() OVER (ORDER BY A.ACTIVATE_DATE ASC) AS row_num
+	            ROW_NUMBER() OVER (ORDER BY A.ACTIVATE_DATE ASC, A.ACTIVATE_ID ASC) AS row_num
 	        FROM ACTIVATE A
 	        JOIN GOOD_PRICE_BUSINESS GPB ON A.STORE_ID = GPB.STORE_ID
 	        JOIN USER_TABLE U ON A.USER_ID = U.USER_ID
@@ -221,42 +279,40 @@
 	    </if>
 	    <![CDATA[
 	    ) paginated_results
-	    WHERE row_num BETWEEN #{pageable.offset} + 1 AND #{pageable.offset} + #{pageable.pageSize}
+	    WHERE row_num > #{pageable.offset} AND row_num <= (#{pageable.offset} + #{pageable.pageSize})
 	    ]]>
 	</select>
 
+
     <!-- 승인관리 리스트 -->
     <select id="findApprovalManagementList" resultType="com.example.finalEclips.eclips.mypage.dto.ApprovalListDto">
-	    SELECT * FROM (
-	        SELECT
-	            am.STORE_ID,
-	            bu.STORE_NAME,
-	            am.MAIN_MENU,
-	            s.SIDO_NAME,
-	            am.PRICE,
-	            am.FINAL_APPROVAL_STATUS,
-	            am.UPDATED_AT,
-	            ROW_NUMBER() OVER (ORDER BY am.UPDATED_AT DESC) AS row_num
-	        FROM APPROVAL_MANAGEMENT am
-	        JOIN GOOD_PRICE_BUSINESS gpb ON am.STORE_ID = gpb.STORE_ID
-	        JOIN USER_TABLE ut ON gpb.USER_ID = ut.USER_ID
-	        JOIN BUSINESS_USER bu ON bu.USER_ID = gpb.USER_ID
-	        JOIN SIGUNGU sg ON bu.SIGUNGU_ID = sg.SIGUNGU_ID
-	        JOIN SIDO s ON sg.SIDO_ID = s.SIDO_ID
-	        WHERE
-	            <choose>
-	                <when test="status == 'ALL'">
-	                    1 = 1
-	                </when>
-	                <otherwise>
-	                    am.FINAL_APPROVAL_STATUS = #{status}
-	                </otherwise>
-	            </choose>
-	   <![CDATA[
-        ) paginated_results
-        WHERE row_num BETWEEN #{pageable.offset} + 1 AND #{pageable.offset} + #{pageable.pageSize}
-        ]]>
-    </select>
+	    SELECT 
+	        am.STORE_ID,
+	        bu.STORE_NAME,
+	        am.MAIN_MENU,
+	        s.SIDO_NAME,
+	        am.PRICE,
+	        am.FINAL_APPROVAL_STATUS,
+	        am.UPDATED_AT
+	    FROM APPROVAL_MANAGEMENT am
+	    JOIN GOOD_PRICE_BUSINESS gpb ON am.STORE_ID = gpb.STORE_ID
+	    JOIN USER_TABLE ut ON gpb.USER_ID = ut.USER_ID
+	    JOIN BUSINESS_USER bu ON bu.USER_ID = gpb.USER_ID
+	    JOIN SIGUNGU sg ON bu.SIGUNGU_ID = sg.SIGUNGU_ID
+	    JOIN SIDO s ON sg.SIDO_ID = s.SIDO_ID
+	    WHERE
+	        <choose>
+	            <when test="status == 'ALL'">
+	                1 = 1
+	            </when>
+	            <otherwise>
+	                am.FINAL_APPROVAL_STATUS = #{status}
+	            </otherwise>
+	        </choose>
+	    ORDER BY am.UPDATED_AT DESC, am.STORE_ID DESC
+	    OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
+	</select>
+
 
     <!-- 승인관리 카운트 -->
     <select id="findTotalActivateCount" resultType="int">
@@ -275,7 +331,7 @@
             SIDO s ON sg.SIDO_ID = s.SIDO_ID
         WHERE
            <choose>
-                <when test="status == 'ALL'">
+                <when test="status eq 'ALL'">
                     1 = 1
                 </when>
                 <otherwise>

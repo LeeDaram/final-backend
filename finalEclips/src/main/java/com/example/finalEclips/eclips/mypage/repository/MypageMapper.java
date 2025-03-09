@@ -30,8 +30,12 @@ public interface MypageMapper {
     // 리뷰 삭제
     void deleteReview(int reviewId);
 
-    // 사용자 아이디 예약 조회
-    List<UserActivateDto> findActivateByPeriod(@Param("userId") String userId, @Param("period") String period);
+    // 사용자 : 아이디 예약 조회 (페이지네이션 포함)
+    List<UserActivateDto> findActivateByPeriod(@Param("userId") String userId, @Param("period") String period,
+            @Param("pageable") Pageable pageable);
+
+    // 사용자 : 아이디 예약 조회 수
+    int countActivateByPeriod(@Param("userId") String userId, @Param("period") String period);
 
     // 예약 삭제
     void deleteActivate(int activateId);
