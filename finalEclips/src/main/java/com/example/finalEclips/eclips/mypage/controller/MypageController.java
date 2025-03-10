@@ -25,7 +25,6 @@ import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreEditDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreInfoDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreRegisterDto;
-import com.example.finalEclips.eclips.mypage.dto.UserActivateDto;
 import com.example.finalEclips.eclips.mypage.service.MypageService;
 
 import lombok.RequiredArgsConstructor;
@@ -51,12 +50,13 @@ public class MypageController {
         return ResponseEntity.ok().build();
     }
 
-    // 사용자 아이디 예약 조회
+    // 사용자 아이디 예약 조회 (페이지네이션 포함)
     @GetMapping("/activate/{userId}/filter")
-    public ResponseEntity<List<UserActivateDto>> getActivateByPeriod(@PathVariable("userId") String userId,
-            @RequestParam("period") String period) {
-        List<UserActivateDto> activates = mypageService.getActivateByPeriod(userId, period);
-        return ResponseEntity.ok(activates);
+    public ResponseEntity<?> getActivateByPeriod(@PathVariable("userId") String userId,
+            @RequestParam("period") String period, @RequestParam("page") int page, @RequestParam("size") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Map<String, Object> response = mypageService.getActivateByPeriod(userId, period, pageable);
+        return ResponseEntity.ok(response);
     }
 
     // 예약 삭제

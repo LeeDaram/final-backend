@@ -58,12 +58,6 @@ public class MypageServiceImpl implements MypageService {
         mypageMapper.deleteReview(reviewId);
     }
 
-    // 사용자 아이디 예약 조회
-    @Override
-    public List<UserActivateDto> getActivateByPeriod(String userId, String period) {
-        return mypageMapper.findActivateByPeriod(userId, period);
-    }
-
     // 예약 삭제
     @Override
     public void deleteActivate(int activateId) {
@@ -92,6 +86,35 @@ public class MypageServiceImpl implements MypageService {
     @Override
     public void saveStoreInfo(ReservationActivateDto reservationActivateDto) {
         mypageMapper.updateStoreInfo(reservationActivateDto);
+    }
+
+    // 사용자 : 예약 조회 (페이지네이션 포함)
+    @Override
+    public Map<String, Object> getActivateByPeriod(String userId, String period, Pageable pageable) {
+        // 전체 개수 조회
+        int totalElements = mypageMapper.countActivateByPeriod(userId, period);
+
+        // 페이징된 데이터 조회
+        List<UserActivateDto> storeActivates = mypageMapper.findActivateByPeriod(userId, period, pageable);
+
+        // 응답 객체 구성
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", storeActivates);
+
+        Map<String, Object> pageInfo = new HashMap<>();
+        pageInfo.put("size", pageable.getPageSize()); // 한 페이지에 보여줄 개수
+        pageInfo.put("number", pageable.getPageNumber()); // 현재 페이지 번호
+        pageInfo.put("totalElements", totalElements); // 전체 개수
+        pageInfo.put("totalPages", (int) Math.ceil((double) totalElements / pageable.getPageSize())); // 총 페이지 수
+
+        response.put("page", pageInfo);
+        return response;
+    }
+
+    // 사용자 :예약 수
+    @Override
+    public int countActivateByPeriod(String userId, String period) {
+        return mypageMapper.countActivateByPeriod(userId, period);
     }
 
     // 사업자 : 기간별 예약 조회 (페이지네이션 포함)

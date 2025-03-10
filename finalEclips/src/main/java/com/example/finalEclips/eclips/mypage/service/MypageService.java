@@ -17,7 +17,6 @@ import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreEditDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreInfoDto;
 import com.example.finalEclips.eclips.mypage.dto.StoreRegisterDto;
-import com.example.finalEclips.eclips.mypage.dto.UserActivateDto;
 
 public interface MypageService {
 
@@ -28,8 +27,11 @@ public interface MypageService {
     // 리뷰 삭제
     void deleteReview(int reviewId);
 
-    // 사용자 아이디 예약 조회
-    List<UserActivateDto> getActivateByPeriod(@Param("userId") String userId, @Param("period") String period);
+    // 사용자 아이디 예약 조회 (페이지네이션 포함)
+    Map<String, Object> getActivateByPeriod(String userId, String period, Pageable pageable);
+
+    // 사용자 : 아이디 예약 조회 수
+    int countActivateByPeriod(String userId, String period);
 
     // 예약 삭제
     void deleteActivate(int activateId);
