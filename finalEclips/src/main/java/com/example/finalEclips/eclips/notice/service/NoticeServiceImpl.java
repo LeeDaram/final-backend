@@ -79,6 +79,7 @@ public class NoticeServiceImpl implements NoticeService {
 		
 	}
 
+	//공지사항
 	@Override
 	public int createNotice(CreateNoticeDto createNoticeDto) {
 		noticeMapper.saveNotice(createNoticeDto);

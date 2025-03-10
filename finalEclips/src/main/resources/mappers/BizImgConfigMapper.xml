@@ -1,0 +1,66 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.example.finalEclips.eclips.bizconfig.repository.BizImgConfigMapper">
+
+	<insert id="saveGpb"
+		parameterType="com.example.finalEclips.eclips.bizconfig.dto.CreateGpbDto">
+		<selectKey keyProperty="storeId" resultType="int"
+			order="BEFORE">
+			SELECT good_price_seq.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO GOOD_PRICE_BUSINESS
+		(STORE_ID, USER_ID, INDUSTRY_ID,
+		CONTACT, STORE_IMAGE, AVERAGE_RATING, TAKEOUT,
+		DELIVERY, WIFI, PET,
+		KID, PARKING)
+		VALUES
+		(#{storeId},#{userId}, #{industryId},
+		#{contact,
+		jdbcType=VARCHAR},
+		#{storeImage, jdbcType=VARCHAR},
+		0,
+		#{takeout},
+		#{delivery},
+		#{wifi},
+		#{pet},
+		#{kid},
+		#{parking})
+	</insert>
+
+	<insert id="saveApproval">
+		INSERT INTO APPROVAL_MANAGEMENT
+		(STORE_ID, MAIN_MENU,
+		PRICE, PRICE_APPROVAL, CLEANLINESS_APPROVAL,
+		FINAL_APPROVAL_STATUS)
+		VALUES(#{storeId}, #{mainMenu}, #{price},
+		#{priceApproval}, #{cleanlinessApproval},
+		#{finalApprovalStatus})
+	</insert>
+
+	<!-- <insert id="saveBizImgAttachments">
+		INSERT INTO post_attachments(post_id, origin_filename,
+		stored_filename, content_type, file_size)
+		VALUES
+		<foreach collection="fileDtos" item="item" separator=",">
+			(#{postId}, #{item.originFilename}, #{item.storedFilename},
+			#{item.contentType}, #{item.size})
+		</foreach>
+	</insert> -->
+	
+
+	<insert id="saveBizImgAttachments">
+		INSERT INTO APPROVAL_MANAGEMENT_ATTACHMENTS
+		(STORE_ID, ORIGIN_FILENAME, STORED_FILENAME, CONTENT_TYPE, FILE_SIZE)
+		VALUES
+		<foreach collection="fileDtos" item="item" separator=",">
+		(#{storeId}, #{item.originFilename}, #{item.storedFilename}, #{item.contentType}, #{item.size})
+		</foreach>
+	</insert>
+	
+
+
+
+</mapper>
