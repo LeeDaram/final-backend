@@ -18,6 +18,9 @@ public interface BizImgConfigMapper {
 	//승인관리 테이블
 	void saveApproval(CreateApprovalDto approvalDto);
 	
+	//가게 예약여부
+	void saveIsActivate(CreateApprovalDto approvalDto);
+	
 	//파일업로드
 	void saveBizImgAttachments(@Param("storeId") int storeId , @Param("fileDtos") List<FileDto> fileDtos);
 	

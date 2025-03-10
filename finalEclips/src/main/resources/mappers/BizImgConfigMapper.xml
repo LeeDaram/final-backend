@@ -5,6 +5,7 @@
 <mapper
 	namespace="com.example.finalEclips.eclips.bizconfig.repository.BizImgConfigMapper">
 
+	<!-- 착한가격업소 테이블 생성 -->
 	<insert id="saveGpb"
 		parameterType="com.example.finalEclips.eclips.bizconfig.dto.CreateGpbDto">
 		<selectKey keyProperty="storeId" resultType="int"
@@ -29,37 +30,38 @@
 		#{kid},
 		#{parking})
 	</insert>
-
+	<!-- 승인테이블 생성 -->
 	<insert id="saveApproval">
 		INSERT INTO APPROVAL_MANAGEMENT
 		(STORE_ID, MAIN_MENU,
 		PRICE, PRICE_APPROVAL, CLEANLINESS_APPROVAL,
 		FINAL_APPROVAL_STATUS)
 		VALUES(#{storeId}, #{mainMenu}, #{price},
-		#{priceApproval}, #{cleanlinessApproval},
+		#{priceApproval},
+		#{cleanlinessApproval},
 		#{finalApprovalStatus})
 	</insert>
 
-	<!-- <insert id="saveBizImgAttachments">
-		INSERT INTO post_attachments(post_id, origin_filename,
-		stored_filename, content_type, file_size)
-		VALUES
-		<foreach collection="fileDtos" item="item" separator=",">
-			(#{postId}, #{item.originFilename}, #{item.storedFilename},
-			#{item.contentType}, #{item.size})
-		</foreach>
-	</insert> -->
-	
-
+	<!-- 파일업로드 -->
 	<insert id="saveBizImgAttachments">
 		INSERT INTO APPROVAL_MANAGEMENT_ATTACHMENTS
-		(STORE_ID, ORIGIN_FILENAME, STORED_FILENAME, CONTENT_TYPE, FILE_SIZE)
+		(STORE_ID, ORIGIN_FILENAME,
+		STORED_FILENAME, CONTENT_TYPE, FILE_SIZE)
 		VALUES
 		<foreach collection="fileDtos" item="item" separator=",">
-		(#{storeId}, #{item.originFilename}, #{item.storedFilename}, #{item.contentType}, #{item.size})
+			(#{storeId}, #{item.originFilename}, #{item.storedFilename},
+			#{item.contentType}, #{item.size})
 		</foreach>
 	</insert>
 	
+	<!-- 예약 T,F -->
+	<insert id="saveIsActivate">
+		INSERT INTO ACTIVATE_RESERVATION
+		(store_id,
+		IS_ACTIVATE)
+		VALUES(#{storeId}, #{isActivate})
+	</insert>
+
 
 
 

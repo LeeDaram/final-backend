@@ -9,5 +9,6 @@ public class CreateApprovalDto {
 	private int price;
 	private char priceApproval;
 	private char cleanlinessApproval;
+	private String isActivate;
 	private String finalApprovalStatus;
 }

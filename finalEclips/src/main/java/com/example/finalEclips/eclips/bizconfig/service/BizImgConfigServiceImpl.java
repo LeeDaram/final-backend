@@ -28,6 +28,7 @@ public class BizImgConfigServiceImpl implements BizImgConfigService{
 	@Override
 	public void createApproval(CreateApprovalDto createApprovalDto) {
 		bizImgConfigMapper.saveApproval(createApprovalDto);
+		bizImgConfigMapper.saveIsActivate(createApprovalDto);
 	}
 
 	@Override
