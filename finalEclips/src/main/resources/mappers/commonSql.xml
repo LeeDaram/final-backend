@@ -36,8 +36,7 @@
                JOIN SIDO sd
                ON sg.SIDO_ID = sd.SIDO_ID
     </sql>
-
-
+	
 	<!-- 페이지네이션 처리 -->
     <sql id="paginationWhere">
         <![CDATA[WHERE row_num >= #{pageable.offset} + 1 AND row_num <= #{pageable.offset} + #{pageable.pageSize}]]>

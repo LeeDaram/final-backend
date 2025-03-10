@@ -7,4 +7,5 @@ public class ReviewRequestDto {
 	private int reviewId;
 	private int storeId;
 	private int isLiked;
+	private String userId;
 }
