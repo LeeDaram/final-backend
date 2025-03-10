@@ -394,5 +394,20 @@
        FROM REVIEW_IMG
        WHERE REVIEW_IMG_ID = #{id}
     </select>
+    
+    <!-- 승인관리 첨부파일 조회 -->
+    <select id="findManagementAttachmentById" resultType="com.example.finalEclips.eclips.mypage.dto.ManagementAttachmentsDto" >
+        SELECT 
+            ATTACHMENT_ID, 
+            STORE_ID, 
+            ORIGIN_FILENAME, 
+            STORED_FILENAME, 
+            CONTENT_TYPE, 
+            FILE_SIZE, 
+            CREATED_AT
+        FROM APPROVAL_MANAGEMENT_ATTACHMENTS
+        WHERE STORE_ID = #{id}
+    </select>
+    
 
 </mapper>

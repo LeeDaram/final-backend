@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
+import com.example.finalEclips.eclips.mypage.dto.ManagementAttachmentsDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewDto;
@@ -66,10 +67,16 @@ public interface MypageService {
     // 승인 반려 상태값 변경
     void updateApprovalStatus(StoreInfoDto storeInfoDto);
 
-    // 파일 조회
+    // 리뷰 파일 조회
     ReviewAttachmentDto getReviewAttachment(int id);
 
-    // 파일 불러오기
+    // 승인관리 파일 조회
+    ManagementAttachmentsDto getManagement(int id);
+
+    // 리뷰 파일 불러오기
     ResponseEntity<Resource> downloadPostAttachmentResource(int id) throws IOException;
+
+    // 승인관리 파일 불러오기
+    ResponseEntity<Resource> downloadManagementAttachmentResource(int id) throws IOException;
 
 }

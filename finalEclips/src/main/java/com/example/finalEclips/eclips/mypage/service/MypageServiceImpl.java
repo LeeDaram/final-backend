@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.example.finalEclips.eclips.helper.FileHelper;
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
 import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
+import com.example.finalEclips.eclips.mypage.dto.ManagementAttachmentsDto;
 import com.example.finalEclips.eclips.mypage.dto.PaginationDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto;
@@ -193,7 +194,7 @@ public class MypageServiceImpl implements MypageService {
         return mypageMapper.findReviewAttachmentById(id);
     }
 
-    // 파일 불러오기
+    // 리뷰 파일 불러오기
     @Override
     public ResponseEntity<Resource> downloadPostAttachmentResource(int id) throws IOException {
         ReviewAttachmentDto reviewAttachment = this.getReviewAttachment(id);
@@ -213,6 +214,33 @@ public class MypageServiceImpl implements MypageService {
                         String.format("inline; filename=\"%s\"", reviewAttachment.getOriginFilename()))
                 .body(resource);
 
+    }
+
+    // 승인관리 파일 조회
+    @Override
+    public ManagementAttachmentsDto getManagement(int id) {
+        return mypageMapper.findManagementAttachmentById(id);
+    }
+
+    // 승인관리 파일 다운
+    @Override
+    public ResponseEntity<Resource> downloadManagementAttachmentResource(int id) throws IOException {
+        ManagementAttachmentsDto managementAttachment = this.getManagement(id);
+        Resource resource = fileHelper.getFileResource(managementAttachment.getStoredFilename());
+
+        // 파일 존재하는지 확인
+        if (!resource.exists()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        String contentType = Files.probeContentType(resource.getFile().toPath());
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        String.format("inline; filename=\"%s\"", managementAttachment.getOriginFilename()))
+                .body(resource);
     }
 
 }

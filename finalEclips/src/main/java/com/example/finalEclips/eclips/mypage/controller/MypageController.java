@@ -140,10 +140,16 @@ public class MypageController {
         return ResponseEntity.ok(mypageService.getReviewAttachment(id));
     }
 
-    // 파일 불러오기
+    // 리뷰 파일 불러오기
     @GetMapping("/posts/attachments/{id}")
     public ResponseEntity<Resource> getPostAttachment(@PathVariable("id") int id) throws IOException {
         return mypageService.downloadPostAttachmentResource(id);
+    }
+
+    // 승인관리 파일 불러오기
+    @GetMapping("/management/attachments/modal/{id}")
+    public ResponseEntity<Resource> getManagementAttachment(@PathVariable("id") int id) throws IOException {
+        return mypageService.downloadManagementAttachmentResource(id);
     }
 
 }

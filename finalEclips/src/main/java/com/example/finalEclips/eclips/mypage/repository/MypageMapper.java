@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.example.finalEclips.eclips.mypage.dto.ApplyStatusDto;
 import com.example.finalEclips.eclips.mypage.dto.ApprovalListDto;
+import com.example.finalEclips.eclips.mypage.dto.ManagementAttachmentsDto;
 import com.example.finalEclips.eclips.mypage.dto.PaginationDto;
 import com.example.finalEclips.eclips.mypage.dto.ReservationActivateDto;
 import com.example.finalEclips.eclips.mypage.dto.ReviewAttachmentDto;
@@ -74,5 +75,8 @@ public interface MypageMapper {
 
     // 이미지 조회
     ReviewAttachmentDto findReviewAttachmentById(int id);
+
+    // 승인관리 상세모달 조회
+    ManagementAttachmentsDto findManagementAttachmentById(int id);
 
 }
