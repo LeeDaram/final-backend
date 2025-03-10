@@ -59,7 +59,7 @@
 		INSERT INTO ACTIVATE_RESERVATION
 		(store_id,
 		IS_ACTIVATE)
-		VALUES(#{storeId}, #{isActivate})
+		 VALUES (#{storeId}, #{isActivate, jdbcType=VARCHAR})
 	</insert>
 
 
