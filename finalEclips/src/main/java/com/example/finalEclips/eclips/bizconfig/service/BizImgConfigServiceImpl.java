@@ -19,6 +19,7 @@ public class BizImgConfigServiceImpl implements BizImgConfigService {
     private final BizImgConfigMapper bizImgConfigMapper;
     private final FileHelper fileHelper;
 
+    // 착한가격업소 등록시 테이블 2개생성
     @Override
     public int createGpb(CreateGpbDto gpbDto) {
         bizImgConfigMapper.saveGpb(gpbDto);
@@ -31,6 +32,7 @@ public class BizImgConfigServiceImpl implements BizImgConfigService {
         bizImgConfigMapper.saveIsActivate(createApprovalDto);
     }
 
+    // 주방사진 업로드
     @Override
     public void createApprovalAttachment(int stortId, List<MultipartFile> files) {
         List<FileDto> fileDtos = fileHelper.uploadFiles(files);
