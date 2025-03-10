@@ -44,15 +44,15 @@
 
     
     <sql id="storeReviewPaginationSql">
-    	select t.*,
-    					<if test="data.sort == 0">
-					ROW_NUMBER() OVER (ORDER BY like_count DESC, like_count) AS row_num
-				</if>
-				<if test="data.sort == 1">
-					ROW_NUMBER() OVER (ORDER BY created_at DESC, created_at) AS row_num
-				</if>
+    	select t.*
 		from(
 			SELECT
+			<if test="data.sort == 0">
+				ROW_NUMBER() OVER (ORDER BY like_count DESC) AS row_num,
+			</if>
+			<if test="data.sort == 1">
+				ROW_NUMBER() OVER (ORDER BY created_at DESC) AS row_num,
+			</if>
 				review_id,
 				store_id,
 				user_id ,
@@ -61,7 +61,7 @@
 				review_menu ,
 				like_count ,
 				review_price ,
-				created_at
+				TO_CHAR(created_at, 'yyyy-MM-dd HH:mm:ss') AS created_at
 			FROM review
 			WHERE store_id = #{data.storeId}
 		) t

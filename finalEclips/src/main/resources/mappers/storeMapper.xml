@@ -149,8 +149,14 @@
 		       ) AS image_ids
 		from(
 			<include refid="CommonSql.storeReviewPaginationSql" />
+			<include refid="CommonSql.paginationWhere" />
 		) t
-		<include refid="CommonSql.paginationWhere" />
+		<if test="data.sort == 0">
+			ORDER BY like_count DESC
+		</if>
+		<if test="data.sort == 1">
+			ORDER BY created_at DESC
+		</if>
 	</select>
 	
 	<select id="findStoreReviewTotalCount" resultType="int">
