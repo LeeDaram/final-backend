@@ -8,7 +8,7 @@ import lombok.Data;
 public class CreateBizUserDto extends CreateUserDto {
 
     @NotNull
-    private int businessRegNo;
+    private long businessRegNo;
 
     @NotNull
     @Size(max = 300)

@@ -12,7 +12,7 @@ public class StoreInfoDto {
     private char priceApproval;
     private char cleanlinessApproval;
     private String finalApprovalStatus;
-    private int businessRegNo;
+    private long businessRegNo;
     private String storeName;
     private String address;
     private String sidoName;
