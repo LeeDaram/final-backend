@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.example.finalEclips.eclips.shop.repository.ShopMapper">
+	<select id="findAllShops"
+		resultType="com.example.finalEclips.eclips.shop.dto.Shopdto">
+		SELECT b.industry_id,
+		b.industry_name,
+		COUNT(*) AS count
+		FROM good_price_business a
+		INNER JOIN industry b
+		ON a.industry_id = b.industry_id
+		GROUP BY b.industry_id, b.industry_name
+	</select>
+</mapper>
