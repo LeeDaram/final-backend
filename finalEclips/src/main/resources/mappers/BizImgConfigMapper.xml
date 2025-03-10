@@ -2,8 +2,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper
-	namespace="com.example.finalEclips.eclips.bizconfig.repository.BizImgConfigMapper">
+<mapper namespace="com.example.finalEclips.eclips.bizconfig.repository.BizImgConfigMapper">
+
 
 	<!-- 착한가격업소 테이블 생성 -->
 	<insert id="saveGpb"
@@ -30,6 +30,8 @@
 		#{kid},
 		#{parking})
 	</insert>
+	
+	
 	<!-- 승인테이블 생성 -->
 	<insert id="saveApproval">
 		INSERT INTO APPROVAL_MANAGEMENT
@@ -41,6 +43,7 @@
 		#{cleanlinessApproval},
 		#{finalApprovalStatus})
 	</insert>
+
 
 	<!-- 파일업로드 -->
 	<insert id="saveBizImgAttachments">
@@ -54,6 +57,7 @@
 		</foreach>
 	</insert>
 	
+	
 	<!-- 예약 T,F -->
 	<insert id="saveIsActivate">
 		INSERT INTO ACTIVATE_RESERVATION
@@ -63,6 +67,60 @@
 	</insert>
 
 
+    <!-- 특정 사용자 ID로 STORE_ID 조회 -->
+	<select id="selectStoreIdByUserId" parameterType="string" resultType="int">
+	    SELECT STORE_ID
+	    FROM GOOD_PRICE_BUSINESS
+	    WHERE USER_ID = #{userId}
+	</select>
 
+    
+    <!-- 재신청 : 착한가격업소 테이블 업데이트 -->
+	<update id="updateGpb" parameterType="com.example.finalEclips.eclips.bizconfig.dto.CreateGpbDto">
+	    UPDATE GOOD_PRICE_BUSINESS
+	    SET USER_ID = #{userId},
+	        INDUSTRY_ID = #{industryId},
+	        CONTACT = #{contact, jdbcType=VARCHAR},
+	        STORE_IMAGE = #{storeImage, jdbcType=VARCHAR},
+	        AVERAGE_RATING = 0,
+	        TAKEOUT = #{takeout},
+	        DELIVERY = #{delivery},
+	        WIFI = #{wifi},
+	        PET = #{pet},
+	        KID = #{kid},
+	        PARKING = #{parking},
+	        UPDATED_AT=CURRENT_TIMESTAMP
+	    WHERE USER_ID = #{userId}
+	</update>
+    
+    
+    <!-- 재신청 : 승인테이블 업데이트 -->
+	<update id="updateApproval">
+	    UPDATE APPROVAL_MANAGEMENT
+	    SET MAIN_MENU = #{mainMenu},
+	        PRICE = #{price},
+	        PRICE_APPROVAL = #{priceApproval},
+	        CLEANLINESS_APPROVAL = #{cleanlinessApproval},
+	        FINAL_APPROVAL_STATUS = #{finalApprovalStatus},
+	        UPDATED_AT=CURRENT_TIMESTAMP
+	    WHERE STORE_ID = #{storeId}
+	</update>
+
+   
+	<!-- 재신청 : 예약 활성화 여부 업데이트 -->
+	<update id="updateIsActivate">
+	    UPDATE ACTIVATE_RESERVATION
+	    SET IS_ACTIVATE = #{isActivate, jdbcType=VARCHAR},
+	        UPDATED_AT=CURRENT_TIMESTAMP
+	    WHERE STORE_ID = #{storeId}
+	</update>
+
+
+    <!-- 재신청 : 사진 삭제 -->
+    <delete id="deleteAttachmentByStoreId">
+        DELETE FROM APPROVAL_MANAGEMENT_ATTACHMENTS
+        WHERE STORE_ID = #{storeId}
+    </delete>
+    
 
 </mapper>
