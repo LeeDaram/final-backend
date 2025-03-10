@@ -36,9 +36,30 @@
 		PRICE, PRICE_APPROVAL, CLEANLINESS_APPROVAL,
 		FINAL_APPROVAL_STATUS)
 		VALUES(#{storeId}, #{mainMenu}, #{price},
-		 #{priceApproval}, #{cleanlinessApproval},
+		#{priceApproval}, #{cleanlinessApproval},
 		#{finalApprovalStatus})
 	</insert>
+
+	<!-- <insert id="saveBizImgAttachments">
+		INSERT INTO post_attachments(post_id, origin_filename,
+		stored_filename, content_type, file_size)
+		VALUES
+		<foreach collection="fileDtos" item="item" separator=",">
+			(#{postId}, #{item.originFilename}, #{item.storedFilename},
+			#{item.contentType}, #{item.size})
+		</foreach>
+	</insert> -->
+	
+
+	<insert id="saveBizImgAttachments">
+		INSERT INTO APPROVAL_MANAGEMENT_ATTACHMENTS
+		(STORE_ID, ORIGIN_FILENAME, STORED_FILENAME, CONTENT_TYPE, FILE_SIZE)
+		VALUES
+		<foreach collection="fileDtos" item="item" separator=",">
+		(#{storeId}, #{item.originFilename}, #{item.storedFilename}, #{item.contentType}, #{item.size})
+		</foreach>
+	</insert>
+	
 
 
 
