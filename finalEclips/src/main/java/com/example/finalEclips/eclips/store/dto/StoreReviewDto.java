@@ -1,6 +1,6 @@
 package com.example.finalEclips.eclips.store.dto;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -14,7 +14,7 @@ public class StoreReviewDto {
 	private String reviewMenu;
 	private int reviewPrice;
 	private int likeCount;
-	private LocalTime createdAt;
+	private LocalDateTime createdAt;
 	private String imageIds;
 	private int sort;
 }
