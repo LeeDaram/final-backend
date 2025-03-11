@@ -91,6 +91,7 @@
 				gpb.PET,
 				gpb.KID,
 				gpb.PARKING,
+				gpb.created_at,
 				bu.STORE_NAME,
 				bu.ADDRESS,
 				bu.LAT,
@@ -108,14 +109,7 @@
 			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 4) AS rating_4_count,
 			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 3) AS rating_3_count,
 			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 2) AS rating_2_count,
-			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 1) AS rating_1_count,
-			   ROW_NUMBER() OVER (ORDER BY 
-            		CASE 
-                		WHEN gpb.created_at >= SYSDATE - 7 THEN 1
-                		ELSE 2 
-            		END,
-            	gpb.created_at DESC 
-       		   ) AS new_store
+			    (SELECT COUNT(*) FROM review r WHERE r.STORE_ID = gpb.STORE_ID AND r.RATING = 1) AS rating_1_count
 			FROM user_table ut
 			INNER JOIN BUSINESS_USER bu
 			ON ut.USER_ID = bu.USER_ID
@@ -185,7 +179,15 @@
 		        <if test="data.parking != null and data.parking != ''">
 		        	AND gpb.PARKING = #{data.parking}
 		        </if>
+		        <!-- AND gpb.created_at >= SYSDATE - 7 -->
+		    
+		    	<!--
+		 		AND
+		        <![CDATA[SYSDATE - TO_DATE(  to_char(gpb.created_at, 'YYYY-MM-DD')) < 30 ]]> -->
+		      
 			</where>
+			<!-- 최신순 -->
+			<!-- ORDER BY gpb.created_at DESC -->
 		) tb	 
     </sql>
       
