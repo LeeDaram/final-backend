@@ -91,6 +91,7 @@
 				gpb.PET,
 				gpb.KID,
 				gpb.PARKING,
+				gpb.created_at,
 				bu.STORE_NAME,
 				bu.ADDRESS,
 				bu.LAT,
@@ -178,7 +179,15 @@
 		        <if test="data.parking != null and data.parking != ''">
 		        	AND gpb.PARKING = #{data.parking}
 		        </if>
+		        <!-- AND gpb.created_at >= SYSDATE - 7 -->
+		    
+		    	<!--
+		 		AND
+		        <![CDATA[SYSDATE - TO_DATE(  to_char(gpb.created_at, 'YYYY-MM-DD')) < 30 ]]> -->
+		      
 			</where>
+			<!-- 최신순 -->
+			<!-- ORDER BY gpb.created_at DESC -->
 		) tb	 
     </sql>
       

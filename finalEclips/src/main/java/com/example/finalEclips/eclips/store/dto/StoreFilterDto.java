@@ -1,5 +1,7 @@
 package com.example.finalEclips.eclips.store.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.Data;
 
 @Data
@@ -30,6 +32,8 @@ public class StoreFilterDto {
 	private String address;
 	private float lat;
 	private float lng;
+	private LocalDateTime createdAt;
+	private int newStore;
     private int rating5Count;
     private int rating4Count;
     private int rating3Count;

@@ -44,6 +44,8 @@ public class SecurityFilterConfiguration {
                 // 역할
                 .requestMatchers("/api/users/personal/**").hasRole("USER").requestMatchers("/api/users/biz/**")
                 .hasRole("BIZ").requestMatchers("/api/users/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/reservation").hasAnyRole("USER", "BIZ", "ADMIN")
+                .requestMatchers("/api/review").hasAnyRole("USER", "BIZ", "ADMIN")
 
                 // 그 외 모든 요청
                 .anyRequest().authenticated());
