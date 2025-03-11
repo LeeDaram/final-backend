@@ -38,106 +38,85 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class StoreController {
- private final StoreService storeService;
- 
- 
+    private final StoreService storeService;
+
 // 	@GetMapping("/stores")
 // 	public ResponseEntity<PageImpl<StoreDto>> getStores(StoreRequestDto storeRequestDto, 
 //		 @PageableDefault(size = 8, page = 0) Pageable pageable){
 //     	return ResponseEntity.ok(storeService.getStores(storeRequestDto, pageable));
 // 	}
- 
- 	@GetMapping("/sido")
- 	public ResponseEntity<List<SidoDto>> getSido(){
- 		return ResponseEntity.ok(storeService.getSido());
-	}
- 	
- 	@GetMapping("/sigungu")
- 	public ResponseEntity<List<SigunguDto>> getSigungu(){
- 		return ResponseEntity.ok(storeService.getSigungu());
- 	}
- 	
- 	@GetMapping("/industry")
- 	public ResponseEntity<List<IndustryDto>> gtIndustry(){
- 		return ResponseEntity.ok(storeService.getIndustry());
- 	}
- 	
- 	@GetMapping("/stores")
- 	public ResponseEntity<PageImpl<StoreFilterDto>> getFilterStore(FilterRequestDto filterRequestDto,
- 			 @PageableDefault(size = 8, page = 0) Pageable pageable){
- 		return ResponseEntity.ok(storeService.getStoreFilter(filterRequestDto, pageable));
- 	}
- 	
-	
+
+    @GetMapping("/sido")
+    public ResponseEntity<List<SidoDto>> getSido() {
+        return ResponseEntity.ok(storeService.getSido());
+    }
+
+    @GetMapping("/sigungu")
+    public ResponseEntity<List<SigunguDto>> getSigungu() {
+        return ResponseEntity.ok(storeService.getSigungu());
+    }
+
+    @GetMapping("/industry")
+    public ResponseEntity<List<IndustryDto>> gtIndustry() {
+        return ResponseEntity.ok(storeService.getIndustry());
+    }
+
+    @GetMapping("/stores")
+    public ResponseEntity<PageImpl<StoreFilterDto>> getFilterStore(FilterRequestDto filterRequestDto,
+            @PageableDefault(size = 8, page = 0) Pageable pageable) {
+        return ResponseEntity.ok(storeService.getStoreFilter(filterRequestDto, pageable));
+    }
+
     @GetMapping("/store/reviews/{storeId}")
     public ResponseEntity<PageImpl<StoreReviewDto>> getStoreReviews(
-    		@PageableDefault(size = 8, page = 0) Pageable pageable,
-    		@PathVariable("storeId") int storeId,
-    		@RequestParam(name = "sort", defaultValue = "0") int sort) {
-    	
-    	StoreReviewRequestDto requestDto = 
-    			StoreReviewRequestDto.builder()
-    			.storeId(storeId)
-    			.sort(sort)
-    			.build();
-    	
+            @PageableDefault(size = 8, page = 0) Pageable pageable, @PathVariable("storeId") int storeId,
+            @RequestParam(name = "sort", defaultValue = "0") int sort) {
+
+        StoreReviewRequestDto requestDto = StoreReviewRequestDto.builder().storeId(storeId).sort(sort).build();
+
         return ResponseEntity.ok(storeService.getStoreReviews(requestDto, pageable));
     }
- 	
- 	@GetMapping("/address")
- 	public ResponseEntity<List<StoreAddressDto>> getAllAddress(){
- 		return ResponseEntity.ok(storeService.getAllAddress());
- 	}
- 	
- 	@PostMapping("/api/reservation")
- 	public ResponseEntity<Void> createActivate(@RequestBody StoreRequestDetailDto storeRequestDetailDto){
- 		storeService.createActivate(storeRequestDetailDto);
- 		return ResponseEntity.status(201).build();
- 	}
- 	
- 	
- 	// 파일 첨부조회
+
+    @GetMapping("/address")
+    public ResponseEntity<List<StoreAddressDto>> getAllAddress() {
+        return ResponseEntity.ok(storeService.getAllAddress());
+    }
+
+    @PostMapping("/api/reservation")
+    public ResponseEntity<Void> createActivate(@RequestBody StoreRequestDetailDto storeRequestDetailDto) {
+        storeService.createActivate(storeRequestDetailDto);
+        return ResponseEntity.status(201).build();
+    }
+
+    // 파일 첨부조회
     @GetMapping("/attachments/{id}")
     public ResponseEntity<ReviewAttachmentDto> getReviewAttachment(@PathVariable("id") int id) {
         return ResponseEntity.ok(storeService.getReviewAttachment(id));
     }
-    
+
     @GetMapping("/review/attachments/{id}/download")
     public ResponseEntity<Resource> showReviewAttachmentResource(@PathVariable("id") int id) throws IOException {
         return storeService.showReviewAttachmentResource(id);
     }
- 	
- 	
- 	// 파일 업로드
- 	@PostMapping("/api/review")
- 	public ResponseEntity<Void> createReview(
- 			@RequestPart("storeId") String storeId,
- 			@RequestPart("userId") String userId,
- 			@RequestPart("rating") String rating,
- 			@RequestPart("cost") String cost,
- 			@RequestPart("menu") String menu,
- 			@RequestPart("review") String review,
- 			@RequestPart("files") List<MultipartFile> files
- 			){
- 		ReviewDto reviewDto = ReviewDto.builder()
- 		 		.storeId(Integer.parseInt(storeId))
- 		 		.userId(userId)
- 		 		.rating(Integer.parseInt(rating))
- 		 		.cost(Integer.parseInt(cost))
- 		 		.menu(menu)
- 		 		.review(review)
- 		 		.build();
- 		storeService.saveReview(reviewDto, files);
- 		return ResponseEntity.status(HttpStatus.CREATED).build();
- 	}
- 
- 	
- 	// 공감수 증감
- 	@PatchMapping("/{reviewId}/like")
- 	public ResponseEntity<ReviewRequestDto> updateReviewById(@PathVariable("reviewId") int reviewId, 
- 			@RequestBody ReviewRequestDto requestDto){
- 		storeService.toggleLike(reviewId, requestDto);
- 		return ResponseEntity.ok().build();
- 	}
- 	
+
+    // 파일 업로드
+    @PostMapping("/api/review")
+    public ResponseEntity<Void> createReview(@RequestPart("storeId") String storeId,
+            @RequestPart("userId") String userId, @RequestPart("rating") String rating,
+            @RequestPart("cost") String cost, @RequestPart("menu") String menu, @RequestPart("review") String review,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+        ReviewDto reviewDto = ReviewDto.builder().storeId(Integer.parseInt(storeId)).userId(userId)
+                .rating(Integer.parseInt(rating)).cost(Integer.parseInt(cost)).menu(menu).review(review).build();
+        storeService.saveReview(reviewDto, files);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // 공감수 증감
+    @PatchMapping("/{reviewId}/like")
+    public ResponseEntity<ReviewRequestDto> updateReviewById(@PathVariable("reviewId") int reviewId,
+            @RequestBody ReviewRequestDto requestDto) {
+        storeService.toggleLike(reviewId, requestDto);
+        return ResponseEntity.ok().build();
+    }
+
 }
